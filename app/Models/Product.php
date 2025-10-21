@@ -22,13 +22,8 @@ class Product extends Model
         return $this->belongsTo(Supplier::class);
     }
 
-    public function stockIns()
+    public function stockHistories()
     {
-        return $this->hasMany(StockIn::class);
-    }
-
-    public function stockOuts()
-    {
-        return $this->hasMany(StockOut::class);
+        return $this->hasMany(StockHistory::class);
     }
 }

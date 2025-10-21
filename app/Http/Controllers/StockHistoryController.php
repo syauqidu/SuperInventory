@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\StockIn;
+use App\Models\StockHistory;
 use Illuminate\Http\Request;
 
-class StockInController extends Controller
+class StockHistoryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class StockInController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(StockIn $stockIn)
+    public function show(StockHistory $stockHistory)
     {
         //
     }
@@ -42,7 +42,7 @@ class StockInController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(StockIn $stockIn)
+    public function edit(StockHistory $stockHistory)
     {
         //
     }
@@ -50,7 +50,7 @@ class StockInController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, StockIn $stockIn)
+    public function update(Request $request, StockHistory $stockHistory)
     {
         //
     }
@@ -58,7 +58,7 @@ class StockInController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(StockIn $stockIn)
+    public function destroy(StockHistory $stockHistory)
     {
         //
     }
