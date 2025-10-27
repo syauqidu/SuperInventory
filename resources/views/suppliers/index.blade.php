@@ -5,12 +5,25 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h2 class="h4 mb-0">Daftar Supplier</h2>
-                    <a href="{{ route('suppliers.create') }}" class="btn btn-primary">
-                        <i class="bi bi-plus-circle-fill me-2"></i>
-                        Tambah Supplier
-                    </a>
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="h4 mb-0">Daftar Supplier</h2>
+                            <small class="text-muted">Total: {{ $supplierCount }}</small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="input-group me-3">
+                                <input type="text" id="searchInput" class="form-control" placeholder="Cari supplier...">
+                                <!--<span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>-->
+                            </div>
+                            <a href="{{ route('suppliers.create') }}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle-fill me-2"></i>
+                                Tambah Supplier
+                            </a>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     @if (session('success'))
@@ -30,7 +43,7 @@
                                     <th scope="col" class="text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="supplierTableBody">
                                 @forelse ($suppliers as $supplier)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
@@ -66,3 +79,28 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('searchInput');
+        const tableBody = document.getElementById('supplierTableBody');
+        const tableRows = tableBody.getElementsByTagName('tr');
+
+        searchInput.addEventListener('keyup', function () {
+            const searchTerm = searchInput.value.toLowerCase();
+
+            for (let i = 0; i < tableRows.length; i++) {
+                const row = tableRows[i];
+                const rowData = row.textContent.toLowerCase();
+
+                if (rowData.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    });
+</script>
+@endpush
