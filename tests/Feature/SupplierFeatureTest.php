@@ -125,4 +125,14 @@ class SupplierFeatureTest extends TestCase
             "supplier_id" => $supplier->id,
         ]);
     }
+    #[Test]
+    public function index_displays_empty_message_when_no_suppliers_exist()
+    {
+        $this->actingAsUser();
+
+        $response = $this->get("/suppliers");
+
+        $response->assertStatus(200);
+        $response->assertSeeText("Tidak ada data supplier.");
+    }
 }
