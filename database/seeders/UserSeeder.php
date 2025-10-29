@@ -14,19 +14,35 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Admin account untuk testing
         User::create([
-            'name' => 'Admin BizGrow',
-            'email' => 'admin@bizgrow.com',
-            'password' => Hash::make('admin123'),
+            'name' => 'Admin SuperInventory',
+            'email' => 'admin@superinventory.com',
+            'password' => Hash::make('password123'), // Sesuai info di halaman login
             'role' => 'admin',
         ]);
 
-        // Staff account
+        // Staff account untuk testing
         User::create([
             'name' => 'Staff Gudang',
-            'email' => 'staff@bizgrow.com',
-            'password' => Hash::make('staff123'),
+            'email' => 'staff@superinventory.com',
+            'password' => Hash::make('password123'), // Sesuai info di halaman login
             'role' => 'staff',
+        ]);
+
+        // Demo accounts untuk tim developer
+        User::create([
+            'name' => 'Nijar',
+            'email' => 'nijar@superinventory.com',
+            'password' => Hash::make('password123'),
+            'role' => 'admin',
+        ]);
+
+        User::create([
+            'name' => 'Kalel',
+            'email' => 'kalel@superinventory.com',
+            'password' => Hash::make('password123'),
+            'role' => 'admin',
         ]);
     }
 }
