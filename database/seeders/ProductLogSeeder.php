@@ -26,7 +26,7 @@ class ProductLogSeeder extends Seeder
 
         $actions = ['created', 'updated', 'deleted'];
 
-        foreach (range(1, 15) as $i) {
+        foreach (range(1, 5) as $i) {
             $user = $users->random();
             $product = $products->random();
             $action = $actions[array_rand($actions)];

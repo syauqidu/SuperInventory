@@ -14,6 +14,23 @@
 </head>
 
 <body class="bg-light">
+    <style>
+        table.table th,
+        table.table td {
+            padding: 0.9rem 1rem !important;
+            vertical-align: middle;
+        }
+
+        table.table {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+        }
+    </style>
+
 
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom">
@@ -48,30 +65,56 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        <div class="mb-4">
-            <h1 class="h4">Logs/History</h1>
-            <p class="text-muted small">History Stok Barang UMKM</p>
+        {{-- Hero Section --}}
+        <div class="mb-2">
+            <a href="{{ url()->previous() }}" class="btn btn-light align-items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" style="width:20px;height:20px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+                <span class="ms-1 me-2">Back</span>
+            </a>
+        </div>
+        <div class="d-flex align-items-center mb-4">
+            <div class="me-2 d-inline-flex align-items-center justify-content-center bg-light rounded-circle"
+                style="width:42px;height:42px;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="#6366f1" style="width:24px;height:24px;">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z" />
+                </svg>
+            </div>
+            <div>
+                <h1 class="h5 mb-0">Logs / History</h1>
+                <p class="text-muted small mb-0">Riwayat Stok Barang UMKM</p>
+            </div>
         </div>
 
+        {{-- table filter/helper --}}
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <form method="GET" action="{{ route('stock-history.index') }}" class="d-flex gap-2">
+                <input type="text" name="search" class="form-control form-control-sm"
+                    placeholder="Search user or product..." value="{{ request('search') }}">
+
+                <select name="action" class="form-select form-select-sm">
+                    <option value="">All Actions</option>
+                    <option value="created" {{ request('action') == 'created' ? 'selected' : '' }}>Created</option>
+                    <option value="updated" {{ request('action') == 'updated' ? 'selected' : '' }}>Updated</option>
+                    <option value="deleted" {{ request('action') == 'deleted' ? 'selected' : '' }}>Deleted</option>
+                </select>
+
+                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                <a href="{{ route('stock-history.index') }}" class="btn btn-light btn-sm">Reset</a>
+            </form>
+        </div>
+
+
+
+        <!-- Table Section -->
         <div class="card mb-4">
             <div class="card-body">
-                {{-- <div class="text-center mb-4">
-                    <div class="mb-2">
-                        <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle"
-                            style="width:56px;height:56px;">
-                            <svg width="28" height="28" fill="none" stroke="#6366f1" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                            </svg>
-                        </div>
-                    </div>
-                    <h2 class="h5 mb-1">Product Logs</h2>
-                    <p class="text-muted small">Riwayat aktivitas pengguna terhadap produk.</p>
-                </div> --}}
-
-                <!-- Table Section -->
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped align-middle">
+                    <table class="table table-hover align-middle">
                         <thead class="table-light">
                             <tr class="text-center">
                                 <th>#</th>
@@ -88,7 +131,21 @@
                                     <td class="text-center">{{ $loop->iteration }}</td>
                                     <td>{{ $log->user->name ?? 'N/A' }}</td>
                                     <td>{{ $log->product->name ?? 'N/A' }}</td>
-                                    <td class="text-capitalize text-center">{{ $log->action }}</td>
+                                    <td class="text-center">
+                                        @php
+                                            $badgeClass = match ($log->action) {
+                                                'created' => 'bg-success',
+                                                'updated' => 'bg-warning text-dark',
+                                                'deleted' => 'bg-danger',
+                                                default => 'bg-secondary',
+                                            };
+                                        @endphp
+
+                                        <span class="badge {{ $badgeClass }} text-capitalize">
+                                            {{ $log->action }}
+                                        </span>
+                                    </td>
+
                                     <td>{{ $log->description }}</td>
                                     <td class="text-muted small">{{ $log->created_at->format('d M Y, H:i') }}</td>
                                 </tr>
