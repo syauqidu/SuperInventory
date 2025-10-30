@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ProductLogs;
 use App\Models\StockHistory;
 use Illuminate\Http\Request;
 
@@ -12,8 +13,10 @@ class StockHistoryController extends Controller
      */
     public function index()
     {
-        //
+        $logs = ProductLogs::with(['user', 'product'])->latest()->get();
+        return view('productLogs.index', compact('logs'));
     }
+
 
     /**
      * Show the form for creating a new resource.
