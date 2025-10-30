@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Dashboard - SuperInventory</title>
-    
+
 </head>
     <!-- Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -61,7 +61,7 @@
 
         <div class="row g-3">
             <div class="col-12 col-md-4">
-                <a href="{{ route('products.index') }}" class="text-decoration-none">
+                <a href="{{ route('stock.index') }}" class="text-decoration-none">
                     <div class="card h-100">
                         <div class="card-body">
                             <h5 class="card-title">Manajemen Stok Barang</h5>
