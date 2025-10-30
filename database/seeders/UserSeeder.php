@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
         // Admin account untuk testing
         User::create([
             'name' => 'Admin SuperInventory',
-            'email' => 'admin@superinventory.com',
+            'email' => 'ind',
             'password' => Hash::make('password123'), // Sesuai info di halaman login
             'role' => 'admin',
         ]);

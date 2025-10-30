@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
 
     // Stock History / Logs - untuk Darryl
     Route::get('/stock-history', [StockHistoryController::class, 'index'])->name('stock-history.index');
+    Route::get('/product-logs/search', [StockHistoryController::class, 'search'])->name('stock-history.search');
 
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
