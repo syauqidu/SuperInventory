@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Models\Supplier;
 use App\Models\ProductLogs;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Container\Attributes\Auth;
