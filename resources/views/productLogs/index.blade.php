@@ -92,11 +92,12 @@
 
         {{-- table filter/helper --}}
         <div class="d-flex align-items-center justify-content-between mb-3">
+            <!-- Search bar -->
+            <input type="text" name="search" class="form-control" placeholder="Search user or product..."
+                value="{{ request('search') }}" style="max-width: 300px; height: 40px;" id="searchInput">
+
             <form method="GET" action="{{ route('stock-history.index') }}"
                 class="d-flex align-items-center flex-wrap gap-2 w-100">
-                <!-- Search bar -->
-                <input type="text" name="search" class="form-control" placeholder="Search user or product..."
-                    value="{{ request('search') }}" style="max-width: 300px; height: 40px;">
 
                 <div class="ms-auto d-flex align-items-center gap-2 flex-wrap">
                     <!-- Action filter -->
@@ -110,7 +111,7 @@
                     <!-- Buttons -->
                     <button type="submit" class="btn btn-primary" style="height: 40px;">Filter</button>
                     <a href="{{ route('stock-history.index') }}" class="btn btn-light border"
-                        style="height: 40px;">Reset</a>
+                        style="height: 40px;">Clear</a>
                 </div>
             </form>
         </div>
@@ -119,7 +120,7 @@
         <div class="card mb-4">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle">
+                    <table class="table table-hover align-middle" id="LogsTableBody">
                         <thead class="table-light">
                             <tr class="text-center">
                                 <th>#</th>
@@ -168,6 +169,19 @@
 
 
     </main>
+
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function() {
+            clearTimeout(this.delay);
+            this.delay = setTimeout(() => {
+                fetch(`{{ route('stock-history.search') }}?search=${encodeURIComponent(this.value)}`)
+                    .then(res => res.text())
+                    .then(html => {
+                        document.querySelector('#LogsTableBody').innerHTML = html;
+                    });
+            }, 400);
+        });
+    </script>
 
 </body>
 

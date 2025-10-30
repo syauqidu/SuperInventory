@@ -11,10 +11,45 @@ class StockHistoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $logs = ProductLogs::with(['user', 'product'])->latest()->get();
+        $query = ProductLogs::with(['user', 'product']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            })->orWhereHas('product', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('action')) {
+            $query->where('action', $request->action);
+        }
+
+        $logs = $query->orderBy('created_at', 'desc')->paginate(10);
+        $logs->appends($request->all());
+
         return view('productLogs.index', compact('logs'));
+    }
+
+    /**
+     * Search for product or username.
+     */
+    public function search(Request $request)
+    {
+        $query = ProductLogs::with(['user', 'product']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('user', fn($q) => $q->where('name', 'like', "%{$search}%"))
+                ->orWhereHas('product', fn($q) => $q->where('name', 'like', "%{$search}%"));
+        }
+
+        $logs = $query->latest()->take(10)->get();
+
+        return view('productLogs.partials.table', compact('logs')); // partial table
     }
 
 
