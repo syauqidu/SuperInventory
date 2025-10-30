@@ -92,23 +92,28 @@
 
         {{-- table filter/helper --}}
         <div class="d-flex align-items-center justify-content-between mb-3">
-            <form method="GET" action="{{ route('stock-history.index') }}" class="d-flex gap-2">
-                <input type="text" name="search" class="form-control form-control-sm"
-                    placeholder="Search user or product..." value="{{ request('search') }}">
+            <form method="GET" action="{{ route('stock-history.index') }}"
+                class="d-flex align-items-center flex-wrap gap-2 w-100">
+                <!-- Search bar -->
+                <input type="text" name="search" class="form-control" placeholder="Search user or product..."
+                    value="{{ request('search') }}" style="max-width: 300px; height: 40px;">
 
-                <select name="action" class="form-select form-select-sm">
-                    <option value="">All Actions</option>
-                    <option value="created" {{ request('action') == 'created' ? 'selected' : '' }}>Created</option>
-                    <option value="updated" {{ request('action') == 'updated' ? 'selected' : '' }}>Updated</option>
-                    <option value="deleted" {{ request('action') == 'deleted' ? 'selected' : '' }}>Deleted</option>
-                </select>
+                <div class="ms-auto d-flex align-items-center gap-2 flex-wrap">
+                    <!-- Action filter -->
+                    <select name="action" class="form-select" style="height: 40px; width: 140px;">
+                        <option value="">All Actions</option>
+                        <option value="created" {{ request('action') == 'created' ? 'selected' : '' }}>Created</option>
+                        <option value="updated" {{ request('action') == 'updated' ? 'selected' : '' }}>Updated</option>
+                        <option value="deleted" {{ request('action') == 'deleted' ? 'selected' : '' }}>Deleted</option>
+                    </select>
 
-                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
-                <a href="{{ route('stock-history.index') }}" class="btn btn-light btn-sm">Reset</a>
+                    <!-- Buttons -->
+                    <button type="submit" class="btn btn-primary" style="height: 40px;">Filter</button>
+                    <a href="{{ route('stock-history.index') }}" class="btn btn-light border"
+                        style="height: 40px;">Reset</a>
+                </div>
             </form>
         </div>
-
-
 
         <!-- Table Section -->
         <div class="card mb-4">
