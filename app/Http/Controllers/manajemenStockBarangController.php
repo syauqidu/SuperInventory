@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductLogs;
 use Illuminate\Http\Request;
 use Exception;
+use Illuminate\Container\Attributes\Auth;
 
 class manajemenStockBarangController extends Controller
 {
@@ -106,6 +108,13 @@ class manajemenStockBarangController extends Controller
 
             $product = Product::create($validatedData);
 
+            ProductLogs::create([
+                'user_id' => Auth::user()->id,
+                'product_id' => $product->id,
+                'action' => 'created',
+                'description' => 'Menambahkan product ' . $product->name,
+            ]);
+
             return response()->json([
                 'message' => 'Berhasil Menambahkan Product',
                 'dataProduct' => $product
@@ -169,6 +178,13 @@ class manajemenStockBarangController extends Controller
 
             $product->update($validatedData);
 
+            ProductLogs::create([
+                'user_id' => Auth::user()->id,
+                'product_id' => $product->id,
+                'action' => 'updated',
+                'description' => 'Update product ' . $product->name,
+            ]);
+
             return response()->json([
                 'message' => 'Berhasil Update Product',
                 'dataProduct' => $product
@@ -197,6 +213,13 @@ class manajemenStockBarangController extends Controller
 
             $product->delete();
 
+            ProductLogs::create([
+                'user_id' => Auth::user()->id,
+                'product_id' => $product->id,
+                'action' => 'delete',
+                'description' => 'Hapus product ' . $product->name,
+            ]);
+
             return response()->json([
                 'message' => 'Berhasil Hapus Product',
                 'dataProduct' => $product
@@ -209,4 +232,3 @@ class manajemenStockBarangController extends Controller
         }
     }
 }
-
