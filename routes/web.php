@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\manajemenStockBarangController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
@@ -37,4 +38,14 @@ Route::middleware('auth')->group(function () {
 
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+});
+
+Route::prefix('manajemenStock')->group(function () {
+
+    Route::get('/', [manajemenStockBarangController::class, 'index'])->name('stock.index');
+    Route::get('/getProductById', [manajemenStockBarangController::class, 'getProductById'])->name('stock.getProductById');
+    Route::get('/getallproduct', [manajemenStockBarangController::class, 'getProducts'])->name('stock.getAllProduct');
+    Route::post('/addProduct', [manajemenStockBarangController::class, 'insertProduct'])->name('stock.addProduct');
+    Route::put('/updateProduct/{id}', [manajemenStockBarangController::class, 'updateProduct']);
+    Route::delete('/deleteProduct/{id}', [manajemenStockBarangController::class, 'deleteProduct'])->name('stock.deleteProduct');
 });
