@@ -42,10 +42,10 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::prefix('manajemenStock')->group(function () {
-
     Route::get('/', [manajemenStockBarangController::class, 'index'])->name('stock.index');
     Route::get('/getProductById', [manajemenStockBarangController::class, 'getProductById'])->name('stock.getProductById');
     Route::get('/getallproduct', [manajemenStockBarangController::class, 'getProducts'])->name('stock.getAllProduct');
+    Route::get('/getSuppliers', [manajemenStockBarangController::class, 'getSuppliers'])->name('stock.getSuppliers');
     Route::post('/addProduct', [manajemenStockBarangController::class, 'insertProduct'])->name('stock.addProduct');
     Route::put('/updateProduct/{id}', [manajemenStockBarangController::class, 'updateProduct']);
     Route::delete('/deleteProduct/{id}', [manajemenStockBarangController::class, 'deleteProduct'])->name('stock.deleteProduct');

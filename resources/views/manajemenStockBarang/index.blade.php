@@ -39,16 +39,13 @@
                             <option value="">Semua Kategori</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col">
                         <select id="sortOption" class="form-select">
                             <option value="">Urutkan</option>
                             <option value="name_asc">Nama (A-Z)</option>
                             <option value="stock_low">Stok Terendah</option>
                             <option value="stock_high">Stok Tertinggi</option>
                         </select>
-                    </div>
-                    <div class="col-md-2 text-end">
-                        <button type="submit" class="btn btn-outline-secondary w-100">Cari</button>
                     </div>
                 </form>
             </div>
@@ -64,7 +61,8 @@
                             <th>Nama Barang</th>
                             <th>Kategori</th>
                             <th>Stok</th>
-                            <th>Unit</th>
+                            <th>Supplier</th>
+                            <th>Satuan Unit</th>
                             <th>Diperbarui</th>
                             <th class="text-center">Aksi</th>
                         </tr>
@@ -105,10 +103,8 @@
                 // Save all products locally
                 allProducts = json.dataProduct;
 
-                // Populate category dropdown (unique categories)
-                const categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
                 filterCategory.innerHTML = `<option value="">Semua Kategori</option>`;
-                categories.forEach(c => {
+                json.kategori.forEach(c => {
                     filterCategory.innerHTML += `<option value="${c}">${c}</option>`;
                 });
 
@@ -138,6 +134,7 @@
                             ${p.stock}
                         </span>
                     </td>
+                    <td>${p.supplier ? p.supplier.name : 'N/A'}</td>
                     <td>${p.unit}</td>
                     <td>${new Date(p.updated_at).toLocaleDateString('id-ID')}</td>
                     <td class="text-center">
@@ -251,8 +248,24 @@
             addModal.show();
         });
 
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const res = await fetch(`${API_BASE}/getSuppliers`);
+                const json = await res.json();
+                const supplierSelect = document.getElementById("addSupplierId");
+
+                supplierSelect.innerHTML = `<option value="">Pilih Supplier</option>`;
+                json.dataSuppliers.forEach(supplier => {
+                    supplierSelect.innerHTML += `<option value="${supplier.id}">${supplier.name}</option>`;
+                });
+            } catch (err) {
+                console.error(err);
+                alert("Gagal memuat data supplier.");
+            }
+        });
+
         // Handle Add Product form
-        document.getElementById("addModal").addEventListener("submit", async (e) => {
+        document.getElementById("addForm").addEventListener("submit", async (e) => {
             e.preventDefault();
 
             const supplier_id = document.getElementById("addSupplierId").value;

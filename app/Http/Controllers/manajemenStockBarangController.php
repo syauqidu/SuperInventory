@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\ProductLogs;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Container\Attributes\Auth;
@@ -71,7 +72,7 @@ class manajemenStockBarangController extends Controller
     {
         try {
             // $id_user = $request->input('id_user');
-            $dataProduct = Product::get();
+            $dataProduct = Product::with('supplier', 'stockHistories')->get();
 
             if (!$dataProduct) {
                 return response()->json([
@@ -227,6 +228,30 @@ class manajemenStockBarangController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Gagal Hapus Product',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getSuppliers(Request $request)
+    {
+        try {
+            $dataSuppliers = Supplier::get();
+
+            if (!$dataSuppliers) {
+                return response()->json([
+                    'message' => 'Suppliers tidak ditemukan',
+                    'dataSuppliers' => null,
+                ], 404);
+            }
+
+            return response()->json([
+                'message' => 'Berhasil Fetch Suppliers',
+                'dataSuppliers' => $dataSuppliers,
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Gagal Get Tahun Ajaran',
                 'error' => $e->getMessage()
             ], 500);
         }
