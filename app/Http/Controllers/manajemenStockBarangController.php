@@ -18,6 +18,7 @@ class manajemenStockBarangController extends Controller
     {
         return view('manajemenStockBarang.index');
     }
+
     public function getProducts(Request $request)
     {
         try {
