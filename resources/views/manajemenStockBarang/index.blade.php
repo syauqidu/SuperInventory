@@ -81,7 +81,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        const API_BASE = "http://127.0.0.1:8000/manajemenStock";
+        const API_BASE = "http://127.0.0.1:8000/products";
         const tableBody = document.getElementById("tableBody");
         const filterCategory = document.getElementById("filterCategory");
         const searchInput = document.getElementById("searchInput");
