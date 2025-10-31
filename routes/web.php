@@ -28,7 +28,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Products - untuk Dafa
-    Route::resource('products', ProductController::class);
+    // Route::resource('products', ProductController::class);
+    Route::prefix('products')->group(function () {
+        Route::get('/', [manajemenStockBarangController::class, 'index'])->name('products.index');
+        Route::get('/getProductById', [manajemenStockBarangController::class, 'getProductById'])->name('products.getProductById');
+        Route::get('/getallproduct', [manajemenStockBarangController::class, 'getProducts'])->name('products.getAllProduct');
+        Route::get('/getSuppliers', [manajemenStockBarangController::class, 'getSuppliers'])->name('products.getSuppliers');
+        Route::post('/addProduct', [manajemenStockBarangController::class, 'insertProduct'])->name('products.addProduct');
+        Route::put('/updateProduct/{id}', [manajemenStockBarangController::class, 'updateProduct'])->name('products.updateProduct');
+        Route::delete('/deleteProduct/{id}', [manajemenStockBarangController::class, 'deleteProduct'])->name('products.deleteProduct');
+    });
 
     // Suppliers - untuk Siganteng
     Route::resource('suppliers', SupplierController::class);
@@ -39,14 +48,4 @@ Route::middleware('auth')->group(function () {
 
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-});
-
-Route::prefix('manajemenStock')->group(function () {
-    Route::get('/', [manajemenStockBarangController::class, 'index'])->name('stock.index');
-    Route::get('/getProductById', [manajemenStockBarangController::class, 'getProductById'])->name('stock.getProductById');
-    Route::get('/getallproduct', [manajemenStockBarangController::class, 'getProducts'])->name('stock.getAllProduct');
-    Route::get('/getSuppliers', [manajemenStockBarangController::class, 'getSuppliers'])->name('stock.getSuppliers');
-    Route::post('/addProduct', [manajemenStockBarangController::class, 'insertProduct'])->name('stock.addProduct');
-    Route::put('/updateProduct/{id}', [manajemenStockBarangController::class, 'updateProduct']);
-    Route::delete('/deleteProduct/{id}', [manajemenStockBarangController::class, 'deleteProduct'])->name('stock.deleteProduct');
 });
