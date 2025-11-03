@@ -1,22 +1,9 @@
+@extends('layouts.app')
+
 @include('manajemenStockBarang.partials.editform')
 @include('manajemenStockBarang.partials.addmodal')
 
-<!DOCTYPE html>
-<html lang="id">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Stok Barang</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    {{-- Bootstrap CSS --}}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    {{-- Bootstrap Icons --}}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-</head>
-
-<body class="bg-light">
-
+@section('content')
     <div class="container py-5">
 
         {{-- Header --}}
@@ -96,7 +83,8 @@
                 const json = await res.json();
 
                 if (!json.dataProduct || json.dataProduct.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Tidak ada produk ditemukan.</td></tr>`;
+                    tableBody.innerHTML =
+                        `<tr><td colspan="7" class="text-center text-muted">Tidak ada produk ditemukan.</td></tr>`;
                     return;
                 }
 
@@ -111,7 +99,8 @@
                 renderTable(allProducts);
             } catch (err) {
                 console.error(err);
-                tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Gagal memuat data produk.</td></tr>`;
+                tableBody.innerHTML =
+                    `<tr><td colspan="7" class="text-center text-danger">Gagal memuat data produk.</td></tr>`;
             }
         }
 
@@ -119,7 +108,8 @@
         function renderTable(data) {
             tableBody.innerHTML = "";
             if (!data.length) {
-                tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Tidak ada produk ditemukan.</td></tr>`;
+                tableBody.innerHTML =
+                    `<tr><td colspan="7" class="text-center text-muted">Tidak ada produk ditemukan.</td></tr>`;
                 return;
             }
 
@@ -229,7 +219,12 @@
                         "Content-Type": "application/json",
                         "X-CSRF-TOKEN": token
                     },
-                    body: JSON.stringify({ name, category, stock, unit }),
+                    body: JSON.stringify({
+                        name,
+                        category,
+                        stock,
+                        unit
+                    }),
                 });
 
                 const json = await res.json();
@@ -256,7 +251,8 @@
 
                 supplierSelect.innerHTML = `<option value="">Pilih Supplier</option>`;
                 json.dataSuppliers.forEach(supplier => {
-                    supplierSelect.innerHTML += `<option value="${supplier.id}">${supplier.name}</option>`;
+                    supplierSelect.innerHTML +=
+                        `<option value="${supplier.id}">${supplier.name}</option>`;
                 });
             } catch (err) {
                 console.error(err);
@@ -283,7 +279,13 @@
                         "Content-Type": "application/json",
                         "X-CSRF-TOKEN": token
                     },
-                    body: JSON.stringify({ supplier_id, name, category, stock, unit }),
+                    body: JSON.stringify({
+                        supplier_id,
+                        name,
+                        category,
+                        stock,
+                        unit
+                    }),
                 });
 
                 const json = await res.json();
@@ -299,6 +301,4 @@
 
         document.addEventListener("DOMContentLoaded", fetchProducts);
     </script>
-</body>
-
-</html>
+@endsection

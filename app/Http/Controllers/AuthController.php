@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\User;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -48,9 +48,18 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
+            // If staff and not approved yet, log out and show message
+            $user = Auth::user();
+            if ($user->role === 'staff' && !$user->approved) {
+                Auth::logout();
+                return redirect()->back()
+                    ->withInput($request->only('email'))
+                    ->with('error', 'Akun Anda belum disetujui oleh admin. Silakan tunggu konfirmasi.');
+            }
+
             // Redirect ke dashboard
             return redirect()->intended(route('dashboard'))
-                ->with('success', 'Selamat datang, ' . Auth::user()->name . '!');
+                ->with('success', 'Selamat datang, ' . $user->name . '!');
         }
 
         // Login gagal
@@ -88,13 +97,16 @@ class AuthController extends Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
 
-        $user = User::create([
+        User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => 'staff',
+            'approved' => false,
         ]);
 
-        Auth::login($user);
-        return redirect('/');
+        // Do NOT auto-login staff — account must be approved by admin first
+        return redirect()->route('login')
+            ->with('success', 'Registrasi berhasil. Akun Anda menunggu persetujuan admin sebelum bisa digunakan.');
     }
 }
