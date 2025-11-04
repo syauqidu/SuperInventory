@@ -12,7 +12,10 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        //
+        $suppliers = Supplier::latest()->get();
+        $supplierCount = $suppliers->count();
+
+        return view("suppliers.index", compact("suppliers", "supplierCount"));
     }
 
     /**
@@ -20,7 +23,7 @@ class SupplierController extends Controller
      */
     public function create()
     {
-        //
+        return view("suppliers.create");
     }
 
     /**
@@ -28,7 +31,17 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            "name" => "required|string|max:100",
+            "contact" => "required|string|max:50",
+            "address" => "nullable|string|max:255",
+        ]);
+
+        Supplier::create($request->all());
+
+        return redirect()
+            ->route("suppliers.index")
+            ->with("success", "Supplier created successfully.");
     }
 
     /**
@@ -36,7 +49,7 @@ class SupplierController extends Controller
      */
     public function show(Supplier $supplier)
     {
-        //
+        return view("suppliers.show", compact("supplier"));
     }
 
     /**
@@ -44,7 +57,7 @@ class SupplierController extends Controller
      */
     public function edit(Supplier $supplier)
     {
-        //
+        return view("suppliers.edit", compact("supplier"));
     }
 
     /**
@@ -52,7 +65,17 @@ class SupplierController extends Controller
      */
     public function update(Request $request, Supplier $supplier)
     {
-        //
+        $request->validate([
+            "name" => "required|string|max:100",
+            "contact" => "required|string|max:50",
+            "address" => "nullable|string|max:255",
+        ]);
+
+        $supplier->update($request->all());
+
+        return redirect()
+            ->route("suppliers.index")
+            ->with("success", "Supplier updated successfully.");
     }
 
     /**
@@ -60,6 +83,10 @@ class SupplierController extends Controller
      */
     public function destroy(Supplier $supplier)
     {
-        //
+        $supplier->delete();
+
+        return redirect()
+            ->route("suppliers.index")
+            ->with("success", "Supplier deleted successfully.");
     }
 }
