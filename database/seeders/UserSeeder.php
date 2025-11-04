@@ -20,6 +20,7 @@ class UserSeeder extends Seeder
             'email' => 'ind',
             'password' => Hash::make('password123'), // Sesuai info di halaman login
             'role' => 'admin',
+            'approved' => true
         ]);
 
         // Staff account untuk testing
@@ -28,6 +29,7 @@ class UserSeeder extends Seeder
             'email' => 'staff@superinventory.com',
             'password' => Hash::make('password123'), // Sesuai info di halaman login
             'role' => 'staff',
+            'approved' => true
         ]);
 
         // Demo accounts untuk tim developer
@@ -36,6 +38,7 @@ class UserSeeder extends Seeder
             'email' => 'nijar@superinventory.com',
             'password' => Hash::make('password123'),
             'role' => 'admin',
+            'approved' => true
         ]);
 
         User::create([
@@ -43,6 +46,7 @@ class UserSeeder extends Seeder
             'email' => 'kalel@superinventory.com',
             'password' => Hash::make('password123'),
             'role' => 'admin',
+            'approved' => true
         ]);
     }
 }

@@ -7,7 +7,7 @@ use App\Models\ProductLogs;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Exception;
-use Illuminate\Container\Attributes\Auth;
+use Illuminate\Support\Facades\Auth;
 
 class manajemenStockBarangController extends Controller
 {
