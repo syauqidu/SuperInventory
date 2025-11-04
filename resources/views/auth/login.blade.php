@@ -49,7 +49,7 @@
         </form>
 
         <div class="mt-3 text-center small">
-            <p class="mb-1 text-muted">Belum punya akun? Hubungi administrator.</p>
+            <p class="text-muted">Belum punya akun? <a href="{{ route('register') }}" class="text-decoration-none fw-semibold">Buat akun</a></p>
         </div>
 
         <div class="mt-3 pt-3 border-top small">
