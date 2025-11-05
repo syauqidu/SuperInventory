@@ -2,9 +2,12 @@ name: CI-SuperInventory
 
 on:
   push:
-    branches: [feature/pipelines]
+    branches:
+      - "*"
   pull_request:
-    branches: [feature/pipelines]
+    branches:
+      - main
+      - develop
 
 jobs:
   test-and-scan:
