@@ -18,8 +18,8 @@
                                     <i class="bi bi-search"></i>
                                 </span>-->
                             </div>
-                            <a href="{{ route('suppliers.create') }}" class="btn btn-primary">
-                                <i class="bi bi-plus-circle-fill me-2"></i>
+                            <a href="{{ route('suppliers.create') }}" class="btn btn-primary text-nowrap">
+                                <i class="bi bi-plus-circle me-1"></i>
                                 Tambah Supplier
                             </a>
                         </div>

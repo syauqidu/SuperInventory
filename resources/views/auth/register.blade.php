@@ -58,9 +58,8 @@
             </div>
             <button type="submit" class="btn btn-primary w-100 py-2">Register</button>
         </form>
-        <div class="mt-3 text-center">
-            <a href="{{ url('/login') }}" class="text-decoration-none">Sudah punya akun? <span
-                    class="fw-semibold">Login</span></a>
+        <div class="mt-3 text-center small">
+            <p class="text-muted">Sudah punya akun? <a href="{{ route('login') }}" class="text-decoration-none fw-semibold">Login</a></p>
         </div>
     </div>
 
