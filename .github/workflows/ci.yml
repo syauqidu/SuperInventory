@@ -10,7 +10,7 @@ on:
       - develop
 
 jobs:
-  test-and-scan:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -43,15 +43,8 @@ jobs:
           DB_DATABASE: database/database.sqlite
         run: php artisan test --coverage-clover=coverage.xml
 
-      - name: Analyze with SonarCloud
-        uses: SonarSource/sonarcloud-github-action@4006f663ecaf1f8093e8e4abb9227f6041f52216
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
         with:
-          args: -Dsonar.projectKey=syauqidu_SuperInventory
-            -Dsonar.organization=syauqidu
-            -Dsonar.sources=app
-            -Dsonar.tests=tests
-            -Dsonar.php.coverage.reportPaths=coverage.xml
-            -Dsonar.exclusions=vendor/**,node_modules/**
-          projectBaseDir: .
+          name: coverage-report
+          path: coverage.xml
