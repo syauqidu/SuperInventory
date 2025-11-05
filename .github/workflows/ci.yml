@@ -40,9 +40,11 @@ jobs:
           DB_DATABASE: database/database.sqlite
         run: php artisan test
 
-      - name: SonarCloud Scan
-        if: ${{ secrets.SONAR_TOKEN != '' }}
-        uses: SonarSource/sonarcloud-github-action@master
+      - name: Analyze with SonarCloud
+        uses: SonarSource/sonarcloud-github-action@4006f663ecaf1f8093e8e4abb9227f6041f52216
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: -Dsonar.projectKey=syauqidu_SuperInventory
+            -Dsonar.organization=syauqidu
+          projectBaseDir: .
