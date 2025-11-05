@@ -10,10 +10,6 @@ use Illuminate\Support\Facades\Hash;
 class RegisterTest extends TestCase
 {
     use RefreshDatabase;
-    // public function test_aja(){
-
-    //     assert(hasil,2);
-    // }
 
     public function test_guest_can_view_register_page()
     {
