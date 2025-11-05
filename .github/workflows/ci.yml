@@ -2,9 +2,9 @@ name: CI-SuperInventory
 
 on:
   push:
-    branches: [ feature/pipelines ]
+    branches: [feature/pipelines]
   pull_request:
-    branches: [ feature/pipelines ]
+    branches: [feature/pipelines]
 
 jobs:
   test-and-scan:
@@ -12,7 +12,7 @@ jobs:
     env:
       # Default to sqlite in-memory for fast tests.
       DB_CONNECTION: sqlite
-      DB_DATABASE: :memory:
+      DB_DATABASE: ":memory:"
       APP_ENV: testing
 
     steps:
@@ -22,7 +22,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: "8.4"
           coverage: none
           extensions: pdo, pdo_sqlite, sqlite3, mbstring, xml, ctype, json, openssl, tokenizer, fileinfo
 
