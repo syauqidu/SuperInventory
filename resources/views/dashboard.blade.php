@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Dashboard - SuperInventory</title>
-    
+
 </head>
     <!-- Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -75,7 +75,7 @@
                     <div class="card h-100">
                         <div class="card-body">
                             <h5 class="card-title">Manajemen Supplier</h5>
-                            <p class="card-text small text-muted">CRUD Supplier - by Siganteng</p>
+                            <p class="card-text small text-muted">CRUD Supplier - by Rafli</p>
                         </div>
                     </div>
                 </a>
@@ -99,7 +99,7 @@
                 <div class="col-6 col-md-4"><div class="p-2 bg-light rounded">Nijar<div class="small text-muted">Frontend - Login</div></div></div>
                 <div class="col-6 col-md-4"><div class="p-2 bg-light rounded">Kalel<div class="small text-muted">Backend - Dashboard</div></div></div>
                 <div class="col-6 col-md-4"><div class="p-2 bg-light rounded">Dafa<div class="small text-muted">Fullstack - Stok Barang</div></div></div>
-                <div class="col-6 col-md-4"><div class="p-2 bg-light rounded">Siganteng<div class="small text-muted">Fullstack - Supplier</div></div></div>
+                <div class="col-6 col-md-4"><div class="p-2 bg-light rounded">Rafli<div class="small text-muted">Fullstack - Supplier</div></div></div>
                 <div class="col-6 col-md-4"><div class="p-2 bg-light rounded">Darryl<div class="small text-muted">Backend - Log/History</div></div></div>
             </div>
         </div>
