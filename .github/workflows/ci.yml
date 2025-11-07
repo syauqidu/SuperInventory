@@ -2,100 +2,100 @@ name: SuperInventory CI/CD Pipeline
 
 on:
   push:
-    branches: [ develop, main, 'Feature/**' ]
+    branches: [develop, main, "Feature/**"]
   pull_request:
-    branches: [ develop, main ]
+    branches: [develop, main]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
-        php-version: ['8.2', '8.3']
-    
+        php-version: ["8.2", "8.3"]
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ matrix.php-version }}
-        extensions: mbstring, xml, ctype, json, sqlite3, pdo_sqlite
-        coverage: xdebug
-    
-    - name: Cache Composer dependencies
-      uses: actions/cache@v3
-      with:
-        path: vendor
-        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-composer-
-    
-    - name: Install Composer dependencies
-      run: composer install --prefer-dist --no-interaction --no-progress
-    
-    - name: Copy .env file
-      run: cp .env.example .env
-    
-    - name: Generate application key
-      run: php artisan key:generate
-    
-    - name: Create SQLite database
-      run: touch database/database.sqlite
-    
-    - name: Run database migrations
-      run: php artisan migrate --force
-    
-    - name: Run database seeders
-      run: php artisan db:seed --force
-    
-    - name: Clear caches
-      run: |
-        php artisan config:clear
-        php artisan cache:clear
-        php artisan view:clear
-        php artisan route:clear
-    
-    - name: Run PHPUnit tests
-      run: php artisan test
-    
-    - name: Check code style with Pint
-      run: ./vendor/bin/pint --test
-      continue-on-error: true
-    
-    - name: Generate test coverage report
-      run: php artisan test --coverage
-      continue-on-error: true
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, xml, ctype, json, sqlite3, pdo_sqlite
+          coverage: xdebug
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Copy .env file
+        run: cp .env.example .env
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Create SQLite database
+        run: touch database/database.sqlite
+
+      - name: Run database migrations
+        run: php artisan migrate --force
+
+      - name: Run database seeders
+        run: php artisan db:seed --force
+
+      - name: Clear caches
+        run: |
+          php artisan config:clear
+          php artisan cache:clear
+          php artisan view:clear
+          php artisan route:clear
+
+      - name: Run PHPUnit tests
+        run: php artisan test
+
+      - name: Check code style with Pint
+        run: ./vendor/bin/pint --test
+        continue-on-error: true
+
+      - name: Generate test coverage report
+        run: php artisan test --coverage
+        continue-on-error: true
 
   security-check:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2'
-    
-    - name: Install Composer dependencies
-      run: composer install --prefer-dist --no-interaction
-    
-    - name: Run security audit
-      run: composer audit
-      continue-on-error: true
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction
+
+      - name: Run security audit
+        run: composer audit
+        continue-on-error: true
 
   notification:
     needs: [build-and-test, security-check]
     runs-on: ubuntu-latest
     if: always()
-    
+
     steps:
-    - name: Send notification
-      run: |
-        echo "CI Pipeline completed!"
-        echo "Build Status: ${{ needs.build-and-test.result }}"
-        echo "Security Check: ${{ needs.security-check.result }}"
+      - name: Send notification
+        run: |
+          echo "CI Pipeline completed!"
+          echo "Build Status: ${{ needs.build-and-test.result }}"
+          echo "Security Check: ${{ needs.security-check.result }}"
