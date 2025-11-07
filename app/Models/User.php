@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'two_factor_enabled',
     ];
 
     /**
@@ -44,6 +45,12 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'two_factor_enabled' => 'boolean',
         ];
+    }
+
+    public function twoFactorCodes()
+    {
+        return $this->hasMany(TwoFactorCode::class);
     }
 }
