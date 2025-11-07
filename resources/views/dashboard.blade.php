@@ -96,7 +96,7 @@
             <h6 class="mb-3">👥 Tim Pengembang SuperInventory</h6>
             <div class="row g-2">
                 <div class="col-6 col-md-4"><div class="p-2 bg-light rounded">Syauqi (Uqi)<div class="small text-muted">Frontend - Register</div></div></div>
-                <div class="col-6 col-md-4"><div class="p-2 bg-light rounded">Nijar ✅<div class="small text-muted">Frontend - Login</div></div></div>
+                <div class="col-6 col-md-4"><div class="p-2 bg-light rounded">Nijar<div class="small text-muted">Frontend - Login</div></div></div>
                 <div class="col-6 col-md-4"><div class="p-2 bg-light rounded">Kalel<div class="small text-muted">Backend - Dashboard</div></div></div>
                 <div class="col-6 col-md-4"><div class="p-2 bg-light rounded">Dafa<div class="small text-muted">Fullstack - Stok Barang</div></div></div>
                 <div class="col-6 col-md-4"><div class="p-2 bg-light rounded">Siganteng<div class="small text-muted">Fullstack - Supplier</div></div></div>

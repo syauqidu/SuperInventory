@@ -57,7 +57,7 @@ class LoginTest extends TestCase
         ]);
         
         $this->assertGuest();
-        $response->assertSessionHasErrors();
+        $response->assertSessionHas('error');
     }
 
     public function test_login_with_invalid_password(): void
@@ -68,7 +68,7 @@ class LoginTest extends TestCase
         ]);
         
         $this->assertGuest();
-        $response->assertSessionHasErrors();
+        $response->assertSessionHas('error');
     }
 
     public function test_login_with_remember_me(): void
@@ -105,14 +105,14 @@ class LoginTest extends TestCase
         $response = $this->post('/logout');
         
         $this->assertGuest();
-        $response->assertRedirect('/login');
+        $response->assertRedirect(route('login'));
     }
 
     public function test_guest_cannot_access_dashboard(): void
     {
         $response = $this->get('/dashboard');
         
-        $response->assertRedirect('/login');
+        $response->assertRedirect(route('login'));
     }
 
     public function test_admin_can_access_dashboard(): void

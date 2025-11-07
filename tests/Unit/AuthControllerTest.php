@@ -50,7 +50,7 @@ class AuthControllerTest extends TestCase
         ]);
         
         $this->assertFalse(Auth::check());
-        $response->assertSessionHasErrors();
+        $response->assertSessionHas('error');
     }
 
     public function test_logout_logs_out_user(): void
