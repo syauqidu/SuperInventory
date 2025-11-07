@@ -43,7 +43,7 @@ class TwoFactorController extends Controller
             ->update(['used' => true]);
 
         // bikin kode random 6 digit
-        $code = sprintf('%06d', rand(0, 999999));
+        $code = sprintf('%06d', random_int(0, 999999));
 
         $twoFactorCode = TwoFactorCode::create([
             'user_id' => $userId,
