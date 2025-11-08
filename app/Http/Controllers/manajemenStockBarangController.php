@@ -128,13 +128,24 @@ class manajemenStockBarangController extends Controller
                 ], 404);
             }
 
+            $changes = [];
+            foreach ($validatedData as $key => $value) {
+                if ($product->{$key} != $value) {
+                    $changes[$key] = ['from' => $product->{$key}, 'to' => $value];
+                }
+            }
             $product->update($validatedData);
 
+            $description = 'Update product ' . $product->name;
+            if (!empty($changes)) {
+                $description .= ' (Changes: ' . json_encode($changes) . ')';
+            }
+
             ProductLogs::create([
-                'user_id' => Auth::user()->id,
+                'user_id' => Auth::id(),
                 'product_id' => $product->id,
                 'action' => 'updated',
-                'description' => 'Update product ' . $product->name,
+                'description' => $description,
             ]);
 
             return response()->json([

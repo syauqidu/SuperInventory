@@ -1,0 +1,112 @@
+<?php
+
+namespace Tests\Feature;
+
+use Tests\TestCase;
+use App\Models\User;
+use App\Models\Product;
+use App\Models\ProductLogs;
+use App\Models\Supplier;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+
+
+class ProductLogTest extends TestCase
+{
+    use RefreshDatabase;
+
+    #[Test]
+    public function it_logs_when_a_product_is_deleted()
+    {
+        // create a user and a product
+        $user = User::factory()->create();
+        $product = Product::factory()->create(['name' => 'Test Product']);
+
+        $response = $this->actingAs($user)->deleteJson("/products/deleteProduct/{$product->id}");
+
+        $response->assertStatus(200);
+
+        $log = \App\Models\ProductLogs::latest()->first();
+        dump($log->toArray());
+
+        $this->assertDatabaseHas('product_logs', [
+            'user_id' => $user->id,
+            'product_id' => null, // <- harusnya null setelah delete
+            'action' => 'delete',
+            'description' => 'Hapus product ' . $product->name,
+        ]);
+    }
+
+    #[Test]
+    public function it_logs_when_a_product_is_updated()
+    {
+        // create a user and a product
+        $user = User::factory()->create();
+        $supplier = Supplier::factory()->create();
+        $this->actingAs($user);
+
+        $product = Product::factory()->create([
+            'supplier_id' => $supplier->id,
+            'name' => 'Old Product',
+            'category' => 'Drinks',
+            'stock' => 5,
+            'unit' => 'bottle',
+        ]);
+
+        $updatedData = [
+            'name' => 'Updated Product',
+            'stock' => 10,
+        ];
+
+        $response = $this->putJson("/products/updateProduct/{$product->id}", $updatedData);
+
+        $response->assertStatus(200);
+
+        $log = \App\Models\ProductLogs::latest()->first();
+        dump($log->toArray());
+
+        $this->assertDatabaseHas('product_logs', [
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'action' => 'updated',
+        ]);
+
+        $log = ProductLogs::latest()->first();
+        $this->assertStringContainsString('"stock":{"from":5,"to":10}', $log->description);
+        $this->assertStringContainsString('"name":{"from":"Old Product","to":"Updated Product"}', $log->description);
+    }
+
+    #[Test]
+    public function it_logs_when_a_product_is_created()
+    {
+        // create a user and a product
+        $user = User::factory()->create();
+        $supplier = Supplier::factory()->create();
+
+        $this->actingAs($user);
+
+        $data = [
+            'supplier_id' => $supplier->id,
+            'name' => 'New Test Product',
+            'category' => 'Food',
+            'stock' => 10,
+            'unit' => 'pcs',
+        ];
+
+        $response = $this->postJson('/products/addProduct', $data);
+
+        $response->assertStatus(201);
+
+        $product = Product::where('name', 'New Test Product')->first();
+
+        $log = \App\Models\ProductLogs::latest()->first();
+        dump($log->toArray());
+
+        $this->assertDatabaseHas('product_logs', [
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'action' => 'created',
+            'description' => 'Menambahkan product ' . $product->name,
+        ]);
+    }
+}
