@@ -19,14 +19,6 @@ class SupplierController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view("suppliers.create");
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -42,22 +34,6 @@ class SupplierController extends Controller
         return redirect()
             ->route("suppliers.index")
             ->with("success", "Supplier created successfully.");
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Supplier $supplier)
-    {
-        return view("suppliers.show", compact("supplier"));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Supplier $supplier)
-    {
-        return view("suppliers.edit", compact("supplier"));
     }
 
     /**

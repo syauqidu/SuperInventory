@@ -43,6 +43,12 @@
                 <label class="form-check-label" for="remember">Ingat saya</label>
             </div>
 
+            <div class="mb-3 text-end">
+                <a href="{{ route('password.request') }}" class="text-decoration-none small">
+                    Lupa password?
+                </a>
+            </div>
+
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary">Masuk ke Dashboard</button>
             </div>

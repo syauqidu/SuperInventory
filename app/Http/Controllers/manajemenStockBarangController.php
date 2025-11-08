@@ -16,28 +16,45 @@ class manajemenStockBarangController extends Controller
         return view('manajemenStockBarang.index');
     }
 
-    public function getProducts()
+    public function getProducts(Request $request)
     {
         try {
-            $products = app(Product::class)::with('supplier')->get();
+            $limit = $request->query('limit', 10);
+            $page = $request->query('page', 1);
 
+            // ✅ Gunakan app() supaya mock Product dari test bisa dipakai
+            $productModel = app(Product::class);
+            $query = $productModel->with('supplier');
+
+            $products = $query->paginate($limit, ['*'], 'page', $page);
 
             if ($products->isEmpty()) {
-                return response()->json(['message' => 'Tidak ada product'], 404);
+                return response()->json([
+                    'message' => 'Tidak ada product',
+                    'dataProduct' => [],
+                ], 404);
             }
 
             return response()->json([
                 'message' => 'Berhasil Get Product',
-                'dataProduct' => $products,
+                'dataProduct' => $products->items(),
+                'pagination' => [
+                    'current_page' => $products->currentPage(),
+                    'last_page' => $products->lastPage(),
+                    'per_page' => $products->perPage(),
+                    'total' => $products->total(),
+                ],
                 'kategori' => $products->pluck('category')->unique()->filter()->values(),
             ], 200);
+
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Gagal Get Tahun Ajaran',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
+
 
     public function insertProduct(Request $request)
     {
@@ -51,6 +68,13 @@ class manajemenStockBarangController extends Controller
             ]);
 
             $product = app(Product::class)->create($validatedData);
+
+            ProductLogs::create([
+                'user_id' => Auth::user()->id,
+                'product_id' => $product->id,
+                'action' => 'created',
+                'description' => 'Menambahkan product ' . $product->name,
+            ]);
 
             return response()->json([
                 'message' => 'Berhasil Menambahkan Product',
@@ -108,10 +132,31 @@ class manajemenStockBarangController extends Controller
             $product = Product::find($id);
 
             if (!$product) {
-                return response()->json(['message' => 'Product tidak ditemukan'], 404);
+                return response()->json([
+                    'message' => 'Product tidak ditemukan',
+                    'dataProduct' => null
+                ], 404);
             }
 
+            $changes = [];
+            foreach ($validatedData as $key => $value) {
+                if ($product->{$key} != $value) {
+                    $changes[$key] = ['from' => $product->{$key}, 'to' => $value];
+                }
+            }
             $product->update($validatedData);
+
+            $description = 'Update product ' . $product->name;
+            if (!empty($changes)) {
+                $description .= ' (Changes: ' . json_encode($changes) . ')';
+            }
+
+            ProductLogs::create([
+                'user_id' => Auth::id(),
+                'product_id' => $product->id,
+                'action' => 'updated',
+                'description' => $description,
+            ]);
 
             return response()->json([
                 'message' => 'Berhasil Update Product',
@@ -141,6 +186,13 @@ class manajemenStockBarangController extends Controller
                     'dataProduct' => null
                 ], 404);
             }
+
+            ProductLogs::create([
+                'user_id' => Auth::user()->id,
+                'product_id' => $product->id,
+                'action' => 'delete',
+                'description' => 'Hapus product ' . $product->name,
+            ]);
 
             $product->delete();
 

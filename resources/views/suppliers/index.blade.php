@@ -14,14 +14,11 @@
                         <div class="d-flex align-items-center">
                             <div class="input-group me-3">
                                 <input type="text" id="searchInput" class="form-control" placeholder="Cari supplier...">
-                                <!--<span class="input-group-text">
-                                    <i class="bi bi-search"></i>
-                                </span>-->
                             </div>
-                            <a href="{{ route('suppliers.create') }}" class="btn btn-primary text-nowrap">
+                            <button type="button" class="btn btn-primary text-nowrap" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
                                 <i class="bi bi-plus-circle me-1"></i>
                                 Tambah Supplier
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -51,10 +48,17 @@
                                     <td>{{ $supplier->contact }}</td>
                                     <td>{{ $supplier->address }}</td>
                                     <td class="text-center">
-                                        <a href="{{ route('suppliers.edit', $supplier->id) }}" class="btn btn-outline-warning btn-sm">
+                                        <button type="button" class="btn btn-outline-warning btn-sm edit-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editSupplierModal"
+                                            data-id="{{ $supplier->id }}"
+                                            data-name="{{ $supplier->name }}"
+                                            data-contact="{{ $supplier->contact }}"
+                                            data-address="{{ $supplier->address }}"
+                                            data-update-url="{{ route('suppliers.update', $supplier->id) }}">
                                             <i class="bi bi-pencil-square me-1"></i>
                                             Edit
-                                        </a>
+                                        </button>
                                         <form action="{{ route('suppliers.destroy', $supplier->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
@@ -78,6 +82,9 @@
         </div>
     </div>
 </div>
+
+@include('suppliers.partials.modals')
+
 @endsection
 
 @push('scripts')
@@ -101,6 +108,31 @@
                 }
             }
         });
+
+        const editSupplierModal = document.getElementById('editSupplierModal');
+        editSupplierModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const name = button.getAttribute('data-name');
+            const contact = button.getAttribute('data-contact');
+            const address = button.getAttribute('data-address');
+            const updateUrl = button.getAttribute('data-update-url');
+
+            const modalForm = document.getElementById('editSupplierForm');
+            modalForm.action = updateUrl;
+
+            const modalNameInput = document.getElementById('edit_name');
+            const modalContactInput = document.getElementById('edit_contact');
+            const modalAddressInput = document.getElementById('edit_address');
+
+            modalNameInput.value = name;
+            modalContactInput.value = contact;
+            modalAddressInput.value = address;
+        });
+
+        @if ($errors->any())
+            var addModal = new bootstrap.Modal(document.getElementById('addSupplierModal'));
+            addModal.show();
+        @endif
     });
 </script>
 @endpush

@@ -94,7 +94,7 @@
         <div class="d-flex align-items-center justify-content-between mb-3">
             <!-- Search bar -->
             <input type="text" name="search" class="form-control" placeholder="Search user or product..."
-                value="{{ request('search') }}" style="max-width: 300px; height: 40px;" id="searchInput">
+                value="{{ request('search') }}" style="max-width: 200px; height: 40px;" id="searchInput">
 
             <form method="GET" action="{{ route('stock-history.index') }}"
                 class="d-flex align-items-center flex-wrap gap-2 w-100">
@@ -108,10 +108,30 @@
                         <option value="deleted" {{ request('action') == 'deleted' ? 'selected' : '' }}>Deleted</option>
                     </select>
 
+                    <select name="user_id" class="form-select" style="height: 40px; width: 180px;">
+                        <option value="">All Users</option>
+                        @foreach ($users as $user)
+                            <option value="{{ $user->id }}"
+                                {{ request('user_id') == $user->id ? 'selected' : '' }}>
+                                {{ $user->name }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}"
+                        style="height: 40px; width: 170px;">
+                    <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}"
+                        style="height: 40px; width: 170px;">
+
                     <!-- Buttons -->
                     <button type="submit" class="btn btn-primary" style="height: 40px;">Filter</button>
                     <a href="{{ route('stock-history.index') }}" class="btn btn-light border"
-                        style="height: 40px;">Clear</a>
+                        style="height: 40px;"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke-width="1.5" stroke="black" width="20" height="20">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+
+                    </a>
                 </div>
             </form>
         </div>

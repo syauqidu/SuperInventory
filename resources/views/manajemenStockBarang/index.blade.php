@@ -8,7 +8,13 @@
 
         {{-- Header --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold">📦 Manajemen Stok Barang</h2>
+            <div class="d-flex align-items-center gap-3">
+                {{-- 🔙 Back Button --}}
+                <button onclick="history.back()" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Kembali
+                </button>
+                <h2 class="fw-bold">📦 Manajemen Stok Barang</h2>
+            </div>
             <button id="btnAdd" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Tambah Barang
             </button>
@@ -41,6 +47,15 @@
         {{-- Table --}}
         <div class="card shadow-sm">
             <div class="card-body">
+                <div class="mb-3">
+                    <label for="perPageSelect" class="form-label">Tampilkan per halaman:</label>
+                    <select id="perPageSelect" class="form-select w-auto d-inline-block">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
                 <table class="table table-hover align-middle" id="productTable">
                     <thead class="table-light">
                         <tr>
@@ -60,6 +75,7 @@
                         </tr>
                     </tbody>
                 </table>
+                <div id="pagination" class="d-flex justify-content-center mt-3"></div>
             </div>
         </div>
     </div>
@@ -68,6 +84,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        let currentPage = 1;
+        let perPage = 10;
+        let lastPage = 1;
         const API_BASE = "http://127.0.0.1:8000/products";
         const tableBody = document.getElementById("tableBody");
         const filterCategory = document.getElementById("filterCategory");
@@ -76,31 +95,27 @@
 
         let allProducts = []; // store all products fetched
 
-        // Fetch all products from backend
-        async function fetchProducts() {
+        async function fetchProducts(page = 1) {
             try {
-                const res = await fetch(`${API_BASE}/getallproduct`);
+                const res = await fetch(`${API_BASE}/getallproduct?page=${page}&limit=${perPage}`);
                 const json = await res.json();
 
                 if (!json.dataProduct || json.dataProduct.length === 0) {
-                    tableBody.innerHTML =
-                        `<tr><td colspan="7" class="text-center text-muted">Tidak ada produk ditemukan.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Tidak ada produk ditemukan.</td></tr>`;
+                    document.getElementById("pagination").innerHTML = "";
                     return;
                 }
 
-                // Save all products locally
                 allProducts = json.dataProduct;
-
-                filterCategory.innerHTML = `<option value="">Semua Kategori</option>`;
-                json.kategori.forEach(c => {
-                    filterCategory.innerHTML += `<option value="${c}">${c}</option>`;
-                });
-
                 renderTable(allProducts);
+
+                // update pagination info
+                currentPage = json.pagination.current_page;
+                lastPage = json.pagination.last_page;
+                renderPagination();
             } catch (err) {
                 console.error(err);
-                tableBody.innerHTML =
-                    `<tr><td colspan="7" class="text-center text-danger">Gagal memuat data produk.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Gagal memuat data produk.</td></tr>`;
             }
         }
 
@@ -115,28 +130,28 @@
 
             data.forEach((p, index) => {
                 tableBody.innerHTML += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${p.name}</td>
-                    <td>${p.category ?? '-'}</td>
-                    <td>
-                        <span class="badge ${p.stock <= 10 ? 'bg-danger' : p.stock < 50 ? 'bg-warning text-dark' : 'bg-success'}">
-                            ${p.stock}
-                        </span>
-                    </td>
-                    <td>${p.supplier ? p.supplier.name : 'N/A'}</td>
-                    <td>${p.unit}</td>
-                    <td>${new Date(p.updated_at).toLocaleDateString('id-ID')}</td>
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-warning me-1"
-                            onclick="editProduct(${p.id}, '${p.name}', '${p.category ?? ''}', ${p.stock}, '${p.unit ?? ''}')">
-                            <i class="bi bi-pencil-square"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                </tr>`;
+                                                        <tr>
+                                                            <td>${index + 1}</td>
+                                                            <td>${p.name}</td>
+                                                            <td>${p.category ?? '-'}</td>
+                                                            <td>
+                                                                <span class="badge ${p.stock <= 10 ? 'bg-danger' : p.stock < 50 ? 'bg-warning text-dark' : 'bg-success'}">
+                                                                    ${p.stock}
+                                                                </span>
+                                                            </td>
+                                                            <td>${p.supplier ? p.supplier.name : 'N/A'}</td>
+                                                            <td>${p.unit}</td>
+                                                            <td>${new Date(p.updated_at).toLocaleDateString('id-ID')}</td>
+                                                            <td class="text-center">
+                                                                <button class="btn btn-sm btn-warning me-1"
+                                                                    onclick="editProduct(${p.id}, '${p.name}', '${p.category ?? ''}', ${p.stock}, '${p.unit ?? ''}')">
+                                                                    <i class="bi bi-pencil-square"></i>
+                                                                </button>
+                                                                <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})">
+                                                                    <i class="bi bi-trash"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>`;
             });
         }
 
@@ -298,7 +313,39 @@
                 alert("Gagal menambahkan produk.");
             }
         });
+        function renderPagination() {
+            const paginationDiv = document.getElementById("pagination");
+            paginationDiv.innerHTML = "";
 
-        document.addEventListener("DOMContentLoaded", fetchProducts);
+            // Previous button
+            paginationDiv.innerHTML += `
+                        <button class="btn btn-outline-primary me-2" 
+                            ${currentPage === 1 ? "disabled" : ""} 
+                            onclick="fetchProducts(${currentPage - 1})">
+                            &laquo; Prev
+                        </button>
+                    `;
+
+            // Page number info
+            paginationDiv.innerHTML += `
+                        <span class="align-self-center mx-2">Halaman ${currentPage} dari ${lastPage}</span>
+                    `;
+
+            // Next button
+            paginationDiv.innerHTML += `
+                        <button class="btn btn-outline-primary ms-2" 
+                            ${currentPage === lastPage ? "disabled" : ""} 
+                            onclick="fetchProducts(${currentPage + 1})">
+                            Next &raquo;
+                        </button>
+                    `;
+        }
+        document.getElementById("perPageSelect").addEventListener("change", (e) => {
+            perPage = parseInt(e.target.value);
+            fetchProducts(1); // reload from first page
+        });
+
+        document.addEventListener("DOMContentLoaded", () => fetchProducts(1));
+
     </script>
 @endsection

@@ -49,13 +49,70 @@
 
         <div class="card mb-4">
             <div class="card-body text-center">
-                <div class="mb-2">
+                <!-- <div class="mb-2">
                     <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle" style="width:56px;height:56px;">
                         <svg width="28" height="28" fill="none" stroke="#6366f1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                     </div>
                 </div>
                 <h2 class="h5 mb-1">Dashboard Content</h2>
-                <p class="text-muted small">Ringkasan ringkas dan navigasi cepat.</p>
+                <p class="text-muted small">Ringkasan ringkas dan navigasi cepat.</p> -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="card text-center border-0 shadow-sm">
+                            <div class="card-body">
+                                <h6 class="text-muted">Total Produk</h6>
+                                <h3 class="fw-bold">{{ $totalProducts }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center border-0 shadow-sm">
+                            <div class="card-body">
+                                <h6 class="text-muted">Total Supplier</h6>
+                                <h3 class="fw-bold">{{ $totalSuppliers }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center border-0 shadow-sm">
+                            <div class="card-body">
+                                <h6 class="text-muted">Total Stok</h6>
+                                <h3 class="fw-bold">{{ $totalStock }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center border-0 shadow-sm">
+                            <div class="card-body">
+                                <h6 class="text-muted">Stok Rendah</h6>
+                                <h3 class="fw-bold text-danger">{{ $lowStockCount }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h6 class="mb-3 fw-semibold">Aktivitas Terbaru (7 Hari Terakhir)</h6>
+                        @if($latestActivities->isEmpty())
+                            <p class="text-muted small mb-0">Belum ada aktivitas terbaru.</p>
+                        @else
+                        <ul class="list-group list-group-flush">
+                            @foreach($latestActivities as $log)
+                                <li class="list-group-item small d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ $log->user->name ?? 'Unknown User' }}</strong> 
+                                        {{ strtolower($log->action) }} 
+                                        <strong>{{ $log->product->name ?? 'Produk Tidak Ditemukan' }}</strong>
+                                    </div>
+                                    <span class="text-muted">{{ $log->created_at->diffForHumans() }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                        @endif
+                    </div>
+                </div>
+
             </div>
         </div>
 
