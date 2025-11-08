@@ -55,6 +55,9 @@ class AuthController extends Controller
                 return redirect()->back()
                     ->withInput($request->only('email'))
                     ->with('error', 'Akun Anda belum disetujui oleh admin. Silakan tunggu konfirmasi.');
+            } else if ($user->role === 'admin') {
+                return redirect()->intended(route('admin.users.index'))
+                    ->with('success', 'Selamat datang, ' . $user->name . '!');
             }
 
             // Redirect ke dashboard

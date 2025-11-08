@@ -62,7 +62,11 @@ Route::middleware("auth")->group(function () {
     });
 
     // Suppliers - untuk Rafli
-    Route::resource("suppliers", SupplierController::class);
+    Route::resource("suppliers", SupplierController::class)->except([
+        "create",
+        "show",
+        "edit",
+    ]);
 
     // Stock History / Logs - untuk Darryl
     Route::get("/stock-history", [
@@ -78,4 +82,34 @@ Route::middleware("auth")->group(function () {
     Route::get("/reports", [ReportController::class, "index"])->name(
         "reports.index",
     );
+
+    // Admin: user management (CRUD + approve)
+    Route::get("/admin/users", [
+        App\Http\Controllers\UserController::class,
+        "index",
+    ])->name("admin.users.index");
+    Route::get("/admin/users/create", [
+        App\Http\Controllers\UserController::class,
+        "create",
+    ])->name("admin.users.create");
+    Route::post("/admin/users", [
+        App\Http\Controllers\UserController::class,
+        "store",
+    ])->name("admin.users.store");
+    Route::get("/admin/users/{user}/edit", [
+        App\Http\Controllers\UserController::class,
+        "edit",
+    ])->name("admin.users.edit");
+    Route::put("/admin/users/{user}", [
+        App\Http\Controllers\UserController::class,
+        "update",
+    ])->name("admin.users.update");
+    Route::delete("/admin/users/{user}", [
+        App\Http\Controllers\UserController::class,
+        "destroy",
+    ])->name("admin.users.destroy");
+    Route::post("/admin/users/{user}/approve", [
+        App\Http\Controllers\UserController::class,
+        "approve",
+    ])->name("admin.users.approve");
 });

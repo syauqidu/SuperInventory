@@ -11,34 +11,27 @@ use Illuminate\Support\Facades\Auth;
 
 class manajemenStockBarangController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return view('manajemenStockBarang.index');
     }
 
-    public function getProducts(Request $request)
+    public function getProducts()
     {
         try {
-            // $id_user = $request->input('id_user');
-            $dataProduct = Product::with('supplier', 'stockHistories')->get();
+            $products = app(Product::class)::with('supplier')->get();
 
-            if (!$dataProduct) {
-                return response()->json([
-                    'message' => 'Product tidak ditemukan',
-                    'dataProduct' => null,
-                    'kategori' => [],
-                ], 404);
+
+            if ($products->isEmpty()) {
+                return response()->json(['message' => 'Tidak ada product'], 404);
             }
 
             return response()->json([
-                'message' => 'Berhasil Fetch Product',
-                'dataProduct' => $dataProduct,
-                'kategori' => $dataProduct->pluck('category')->unique()->filter()->values(),
+                'message' => 'Berhasil Get Product',
+                'dataProduct' => $products,
+                'kategori' => $products->pluck('category')->unique()->filter()->values(),
             ], 200);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Gagal Get Tahun Ajaran',
                 'error' => $e->getMessage()
@@ -46,7 +39,6 @@ class manajemenStockBarangController extends Controller
         }
     }
 
-    // ✅ CREATE
     public function insertProduct(Request $request)
     {
         try {
@@ -58,20 +50,18 @@ class manajemenStockBarangController extends Controller
                 'unit' => 'nullable|string|max:50',
             ]);
 
-            $product = Product::create($validatedData);
-
-            ProductLogs::create([
-                'user_id' => Auth::user()->id,
-                'product_id' => $product->id,
-                'action' => 'created',
-                'description' => 'Menambahkan product ' . $product->name,
-            ]);
+            $product = app(Product::class)->create($validatedData);
 
             return response()->json([
                 'message' => 'Berhasil Menambahkan Product',
                 'dataProduct' => $product
             ], 201);
-        } catch (Exception $e) {
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Gagal Menambahkan Product',
                 'error' => $e->getMessage()
@@ -79,7 +69,6 @@ class manajemenStockBarangController extends Controller
         }
     }
 
-    // ✅ READ (By ID)
     public function getProductById(Request $request)
     {
         try {
@@ -97,7 +86,7 @@ class manajemenStockBarangController extends Controller
             return response()->json([
                 'message' => 'Berhasil Fetch Detail Product',
                 'dataProduct' => $product,
-                'kategori' => $product->pluck('category')->unique()->filter()->values(),
+                'kategori' => collect([$product->category])->filter()->values(),
             ], 200);
         } catch (Exception $e) {
             return response()->json([
@@ -107,16 +96,13 @@ class manajemenStockBarangController extends Controller
         }
     }
 
-    // ✅ UPDATE
     public function updateProduct(Request $request, $id)
     {
         try {
             $validatedData = $request->validate([
-                'supplier_id' => 'sometimes|exists:suppliers,id',
-                'name' => 'sometimes|string|max:255',
-                'category' => 'sometimes|string|max:255',
                 'stock' => 'sometimes|integer|min:0',
-                'unit' => 'sometimes|string|max:50',
+                'name' => 'sometimes|string|max:255',
+                'category' => 'nullable|string|max:255',
             ]);
 
             $product = Product::find($id);
@@ -152,7 +138,12 @@ class manajemenStockBarangController extends Controller
                 'message' => 'Berhasil Update Product',
                 'dataProduct' => $product
             ], 200);
-        } catch (Exception $e) {
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Gagal Update Product',
                 'error' => $e->getMessage()
@@ -160,8 +151,6 @@ class manajemenStockBarangController extends Controller
         }
     }
 
-
-    // ✅ DELETE
     public function deleteProduct($id)
     {
         try {
@@ -200,7 +189,7 @@ class manajemenStockBarangController extends Controller
         try {
             $dataSuppliers = Supplier::get();
 
-            if (!$dataSuppliers) {
+            if ($dataSuppliers->isEmpty()) {
                 return response()->json([
                     'message' => 'Suppliers tidak ditemukan',
                     'dataSuppliers' => null,
