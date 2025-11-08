@@ -27,7 +27,6 @@ class ProductFeatureTest extends TestCase
         $this->supplier = Supplier::factory()->create();
     }
 
-    // ✅ COVER index()
     public function test_index_view_loads_successfully()
     {
         View::addLocation(resource_path('views')); // ensure view path exists
@@ -36,7 +35,6 @@ class ProductFeatureTest extends TestCase
         $response->assertStatus(200);
     }
 
-    // ✅ SUCCESS: get all products
     public function test_it_can_fetch_all_products()
     {
         Product::factory()->count(3)->create(['supplier_id' => $this->supplier->id]);
@@ -47,18 +45,17 @@ class ProductFeatureTest extends TestCase
             ->assertJsonStructure(['message', 'dataProduct', 'kategori']);
     }
 
-    // ❌ ERROR: get products returns 404 when empty
     public function test_get_products_returns_404_if_empty()
     {
         Product::query()->delete();
 
         $response = $this->getJson('/products/getallproduct');
 
-        // Manually mock false return condition
-        $this->assertTrue(true); // no error; coverage for empty
+        $response->assertStatus(404)
+            ->assertJson(['message' => 'Tidak ada product']);
     }
 
-    // ✅ SUCCESS: insert a product
+
     public function test_it_can_insert_a_product()
     {
         $payload = [
@@ -75,7 +72,6 @@ class ProductFeatureTest extends TestCase
             ->assertJson(['message' => 'Berhasil Menambahkan Product']);
     }
 
-    // ❌ ERROR: insert product fails validation
     public function test_insert_product_validation_fails()
     {
         $payload = [
@@ -88,7 +84,6 @@ class ProductFeatureTest extends TestCase
         $response->assertStatus(422);
     }
 
-    // ✅ SUCCESS: fetch product by ID
     public function test_it_can_fetch_product_by_id()
     {
         $product = Product::factory()->create(['supplier_id' => $this->supplier->id]);
@@ -98,7 +93,6 @@ class ProductFeatureTest extends TestCase
             ->assertJson(['message' => 'Berhasil Fetch Detail Product']);
     }
 
-    // ❌ ERROR: product not found by ID
     public function test_get_product_by_id_returns_404_if_not_found()
     {
         $response = $this->getJson('/products/getProductById?id=99999');
@@ -106,7 +100,6 @@ class ProductFeatureTest extends TestCase
             ->assertJson(['message' => 'Product tidak ditemukan']);
     }
 
-    // ✅ SUCCESS: update product
     public function test_it_can_update_a_product()
     {
         $product = Product::factory()->create(['supplier_id' => $this->supplier->id]);
@@ -119,7 +112,6 @@ class ProductFeatureTest extends TestCase
             ->assertJson(['message' => 'Berhasil Update Product']);
     }
 
-    // ❌ ERROR: update product not found
     public function test_update_product_returns_404_if_not_found()
     {
         $response = $this->putJson('/products/updateProduct/99999', [
@@ -130,7 +122,6 @@ class ProductFeatureTest extends TestCase
             ->assertJson(['message' => 'Product tidak ditemukan']);
     }
 
-    // ❌ ERROR: update product validation fails
     public function test_update_product_validation_fails()
     {
         $product = Product::factory()->create(['supplier_id' => $this->supplier->id]);
@@ -142,7 +133,6 @@ class ProductFeatureTest extends TestCase
         $response->assertStatus(422);
     }
 
-    // ✅ SUCCESS: delete product
     public function test_it_can_delete_a_product()
     {
         $product = Product::factory()->create(['supplier_id' => $this->supplier->id]);
@@ -153,7 +143,6 @@ class ProductFeatureTest extends TestCase
             ->assertJson(['message' => 'Berhasil Hapus Product']);
     }
 
-    // ❌ ERROR: delete product not found
     public function test_delete_product_returns_404_if_not_found()
     {
         $response = $this->deleteJson('/products/deleteProduct/99999');
@@ -161,7 +150,6 @@ class ProductFeatureTest extends TestCase
             ->assertJson(['message' => 'Product tidak ditemukan']);
     }
 
-    // ✅ SUCCESS: fetch suppliers
     public function test_it_can_fetch_all_suppliers()
     {
         Supplier::factory()->count(2)->create();
@@ -172,18 +160,17 @@ class ProductFeatureTest extends TestCase
             ->assertJsonStructure(['message', 'dataSuppliers']);
     }
 
-    // ❌ ERROR: no suppliers found
     public function test_get_suppliers_returns_404_if_none_exist()
     {
         Supplier::query()->delete();
 
         $response = $this->getJson('/products/getSuppliers');
 
-        // Controller returns 404 if !$dataSuppliers
-        $this->assertTrue(true);
+        $response->assertStatus(404)
+            ->assertJson(['message' => 'Suppliers tidak ditemukan']);
     }
 
-    // 🧨 EXCEPTION: simulate exception in insertProduct
+
     public function test_insert_product_handles_exception()
     {
         $mock = $this->partialMock(Product::class, function ($mock) {
@@ -201,7 +188,6 @@ class ProductFeatureTest extends TestCase
             ->assertJson(['message' => 'Gagal Menambahkan Product']);
     }
 
-    // 🧨 EXCEPTION: simulate exception in getProducts
     public function test_get_products_handles_exception()
     {
         $this->mock(Product::class, function ($mock) {

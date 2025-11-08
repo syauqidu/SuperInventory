@@ -16,28 +16,45 @@ class manajemenStockBarangController extends Controller
         return view('manajemenStockBarang.index');
     }
 
-    public function getProducts()
+    public function getProducts(Request $request)
     {
         try {
-            $products = app(Product::class)::with('supplier')->get();
+            $limit = $request->query('limit', 10);
+            $page = $request->query('page', 1);
 
+            // ✅ Gunakan app() supaya mock Product dari test bisa dipakai
+            $productModel = app(Product::class);
+            $query = $productModel->with('supplier');
+
+            $products = $query->paginate($limit, ['*'], 'page', $page);
 
             if ($products->isEmpty()) {
-                return response()->json(['message' => 'Tidak ada product'], 404);
+                return response()->json([
+                    'message' => 'Tidak ada product',
+                    'dataProduct' => [],
+                ], 404);
             }
 
             return response()->json([
                 'message' => 'Berhasil Get Product',
-                'dataProduct' => $products,
+                'dataProduct' => $products->items(),
+                'pagination' => [
+                    'current_page' => $products->currentPage(),
+                    'last_page' => $products->lastPage(),
+                    'per_page' => $products->perPage(),
+                    'total' => $products->total(),
+                ],
                 'kategori' => $products->pluck('category')->unique()->filter()->values(),
             ], 200);
+
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Gagal Get Tahun Ajaran',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
+
 
     public function insertProduct(Request $request)
     {

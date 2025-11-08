@@ -3,7 +3,7 @@
 use App\Http\Controllers\manajemenStockBarangController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\StockHistoryController;
 use App\Http\Controllers\ReportController;
@@ -22,9 +22,9 @@ Route::middleware("guest")->group(function () {
 // Protected routes (harus login)
 Route::middleware("auth")->group(function () {
     // Dashboard - untuk Kalel
-    Route::get("/dashboard", function () {
-        return view("dashboard");
-    })->name("dashboard");
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('dashboard');
 
     // Logout
     Route::post("/logout", [AuthController::class, "logout"])->name("logout");
