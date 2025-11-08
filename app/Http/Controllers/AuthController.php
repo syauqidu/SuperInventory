@@ -24,7 +24,7 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        // Validasi input
+        // validasi dulu
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|min:6',
@@ -41,11 +41,31 @@ class AuthController extends Controller
                 ->withInput($request->only('email'));
         }
 
-        // Attempt login
         $credentials = $request->only('email', 'password');
         $remember = $request->has('remember');
 
-        if (Auth::attempt($credentials, $remember)) {
+        // cek credential valid atau nggak
+        if (Auth::validate($credentials)) {
+            $user = Auth::getProvider()->retrieveByCredentials($credentials);
+
+            // cek apakah user aktifin 2FA
+            if ($user->two_factor_enabled) {
+                // generate kode 2FA
+                $twoFactorController = new \App\Http\Controllers\TwoFactorController();
+                $code = $twoFactorController->generateTwoFactorCode($user->id);
+
+                // simpen user id di session buat verifikasi nanti
+                session([
+                    '2fa_user_id' => $user->id,
+                    '2fa_remember' => $remember,
+                ]);
+
+                return redirect()->route('two-factor.verify')
+                    ->with('success', 'Kode verifikasi 2FA telah dikirim. Silakan masukkan kode.');
+            }
+
+            // kalo ga pake 2FA langsung login aja
+            Auth::login($user, $remember);
             $request->session()->regenerate();
 
             // If staff and not approved yet, log out and show message
@@ -60,12 +80,11 @@ class AuthController extends Controller
                     ->with('success', 'Selamat datang, ' . $user->name . '!');
             }
 
-            // Redirect ke dashboard
             return redirect()->intended(route('dashboard'))
                 ->with('success', 'Selamat datang, ' . $user->name . '!');
         }
 
-        // Login gagal
+        // kalo gagal login
         return redirect()->back()
             ->withInput($request->only('email'))
             ->with('error', 'Email atau password salah. Silakan coba lagi.');
