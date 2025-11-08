@@ -15,7 +15,7 @@ class StockHistoryController extends Controller
     {
         $query = ProductLogs::with(['user', 'product']);
 
-        // 🔍 Search by user name or product name
+        // Search by user name or product name
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -28,17 +28,17 @@ class StockHistoryController extends Controller
             });
         }
 
-        // ⚙️ Filter by action (created / updated / deleted)
+        // Filter by action (created / updated / deleted)
         if ($request->filled('action')) {
             $query->where('action', $request->action);
         }
 
-        // 👤 Filter by specific user
+        // Filter by specific user
         if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
         }
 
-        // 📅 Filter by date range
+        // Filter by date range
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $query->whereBetween('created_at', [
                 $request->start_date . ' 00:00:00',
@@ -49,7 +49,6 @@ class StockHistoryController extends Controller
         $logs = $query->orderBy('created_at', 'desc')->paginate(10);
         $logs->appends($request->all());
 
-        // Pass users list to the view for the dropdown filter
         $users = \App\Models\User::all();
 
         return view('productLogs.index', compact('logs', 'users'));
