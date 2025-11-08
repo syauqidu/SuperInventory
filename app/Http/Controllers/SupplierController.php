@@ -37,22 +37,6 @@ class SupplierController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Supplier $supplier)
-    {
-        return view("suppliers.show", compact("supplier"));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Supplier $supplier)
-    {
-        return view("suppliers.edit", compact("supplier"));
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Supplier $supplier)
