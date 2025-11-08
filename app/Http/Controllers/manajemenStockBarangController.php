@@ -107,6 +107,13 @@ class manajemenStockBarangController extends Controller
 
             $product = Product::find($id);
 
+            ProductLogs::create([
+                'user_id' => Auth::user()->id,
+                'product_id' => $product->id,
+                'action' => 'created',
+                'description' => 'Menambahkan product ' . $product->name,
+            ]);
+
             if (!$product) {
                 return response()->json([
                     'message' => 'Product tidak ditemukan',
