@@ -129,7 +129,7 @@ class ProductLogTest extends TestCase
             'action' => 'updated',
         ]);
 
-        $response = $this->get(route('productLogs.search', ['search' => 'John']));
+        $response = $this->get(route('/products-logs/search', ['search' => 'John']));
 
         $response->assertStatus(200);
         $response->assertSee('John Doe');
@@ -156,7 +156,7 @@ class ProductLogTest extends TestCase
         ]);
 
         // Search by product name
-        $response = $this->get(route('productLogs.search', ['search' => 'Milk']));
+        $response = $this->get(route('/products-logs/search', ['search' => 'Milk']));
 
         $response->assertStatus(200);
         $response->assertSee('Milk Tea');
