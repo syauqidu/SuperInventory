@@ -69,6 +69,13 @@ class manajemenStockBarangController extends Controller
 
             $product = app(Product::class)->create($validatedData);
 
+            ProductLogs::create([
+                'user_id' => Auth::user()->id,
+                'product_id' => $product->id,
+                'action' => 'created',
+                'description' => 'Menambahkan product ' . $product->name,
+            ]);
+
             return response()->json([
                 'message' => 'Berhasil Menambahkan Product',
                 'dataProduct' => $product
@@ -125,10 +132,31 @@ class manajemenStockBarangController extends Controller
             $product = Product::find($id);
 
             if (!$product) {
-                return response()->json(['message' => 'Product tidak ditemukan'], 404);
+                return response()->json([
+                    'message' => 'Product tidak ditemukan',
+                    'dataProduct' => null
+                ], 404);
             }
 
+            $changes = [];
+            foreach ($validatedData as $key => $value) {
+                if ($product->{$key} != $value) {
+                    $changes[$key] = ['from' => $product->{$key}, 'to' => $value];
+                }
+            }
             $product->update($validatedData);
+
+            $description = 'Update product ' . $product->name;
+            if (!empty($changes)) {
+                $description .= ' (Changes: ' . json_encode($changes) . ')';
+            }
+
+            ProductLogs::create([
+                'user_id' => Auth::id(),
+                'product_id' => $product->id,
+                'action' => 'updated',
+                'description' => $description,
+            ]);
 
             return response()->json([
                 'message' => 'Berhasil Update Product',
@@ -158,6 +186,13 @@ class manajemenStockBarangController extends Controller
                     'dataProduct' => null
                 ], 404);
             }
+
+            ProductLogs::create([
+                'user_id' => Auth::user()->id,
+                'product_id' => $product->id,
+                'action' => 'delete',
+                'description' => 'Hapus product ' . $product->name,
+            ]);
 
             $product->delete();
 
