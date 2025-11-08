@@ -69,6 +69,13 @@ class manajemenStockBarangController extends Controller
 
             $product = app(Product::class)->create($validatedData);
 
+            ProductLogs::create([
+                'user_id' => Auth::user()->id,
+                'product_id' => $product->id,
+                'action' => 'created',
+                'description' => 'Menambahkan product ' . $product->name,
+            ]);
+
             return response()->json([
                 'message' => 'Berhasil Menambahkan Product',
                 'dataProduct' => $product
@@ -123,13 +130,6 @@ class manajemenStockBarangController extends Controller
             ]);
 
             $product = Product::find($id);
-
-            ProductLogs::create([
-                'user_id' => Auth::user()->id,
-                'product_id' => $product->id,
-                'action' => 'created',
-                'description' => 'Menambahkan product ' . $product->name,
-            ]);
 
             if (!$product) {
                 return response()->json([
