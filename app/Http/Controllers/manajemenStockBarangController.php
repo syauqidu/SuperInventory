@@ -19,15 +19,22 @@ class manajemenStockBarangController extends Controller
     public function getProducts(Request $request)
     {
         try {
-            $limit = $request->query('limit', 10); // default 10 per page
+            $limit = $request->query('limit', 10);
             $page = $request->query('page', 1);
 
-            $products = Product::with('supplier')->paginate($limit, ['*'], 'page', $page);
+            // ✅ Gunakan app() supaya mock Product dari test bisa dipakai
+            $productModel = app(Product::class);
+            $query = $productModel->with('supplier');
 
+            $products = $query->paginate($limit, ['*'], 'page', $page);
 
             if ($products->isEmpty()) {
-                return response()->json(['message' => 'Tidak ada product'], 404);
+                return response()->json([
+                    'message' => 'Tidak ada product',
+                    'dataProduct' => [],
+                ], 404);
             }
+
             return response()->json([
                 'message' => 'Berhasil Get Product',
                 'dataProduct' => $products->items(),
@@ -43,10 +50,11 @@ class manajemenStockBarangController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Gagal Get Tahun Ajaran',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
+
 
     public function insertProduct(Request $request)
     {

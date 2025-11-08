@@ -51,9 +51,10 @@ class ProductFeatureTest extends TestCase
 
         $response = $this->getJson('/products/getallproduct');
 
-        // Manually mock false return condition
-        $this->assertTrue(true); // no error; coverage for empty
+        $response->assertStatus(404)
+            ->assertJson(['message' => 'Tidak ada product']);
     }
+
 
     public function test_it_can_insert_a_product()
     {
@@ -165,8 +166,10 @@ class ProductFeatureTest extends TestCase
 
         $response = $this->getJson('/products/getSuppliers');
 
-        $this->assertTrue(true);
+        $response->assertStatus(404)
+            ->assertJson(['message' => 'Suppliers tidak ditemukan']);
     }
+
 
     public function test_insert_product_handles_exception()
     {
