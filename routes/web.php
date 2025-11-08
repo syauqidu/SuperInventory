@@ -4,6 +4,7 @@ use App\Http\Controllers\manajemenStockBarangController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\StockHistoryController;
 use App\Http\Controllers\ReportController;
@@ -17,6 +18,12 @@ Route::middleware("guest")->group(function () {
         "register",
     );
     Route::post("/register", [AuthController::class, "register"]);
+    
+    // Forgot Password
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotPasswordForm'])->name('password.request');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])->name('password.email');
+    Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('password.reset');
+    Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
 });
 
 // Protected routes (harus login)
