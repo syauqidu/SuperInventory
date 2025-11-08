@@ -163,14 +163,14 @@ class manajemenStockBarangController extends Controller
                 ], 404);
             }
 
-            $product->delete();
+            ProductLogs::create([
+                'user_id' => Auth::user()->id,
+                'product_id' => $product->id,
+                'action' => 'delete',
+                'description' => 'Hapus product ' . $product->name,
+            ]);
 
-            // ProductLogs::create([
-            //     'user_id' => Auth::user()->id,
-            //     'product_id' => $product->id,
-            //     'action' => 'delete',
-            //     'description' => 'Hapus product ' . $product->name,
-            // ]);
+            $product->delete();
 
             return response()->json([
                 'message' => 'Berhasil Hapus Product',
