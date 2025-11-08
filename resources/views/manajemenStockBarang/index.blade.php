@@ -17,43 +17,7 @@
 
 <body class="bg-light">
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom">
-        <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center" href="#">
-                <div class="me-2 d-inline-flex align-items-center justify-content-center"
-                    style="width:38px;height:38px;background:linear-gradient(135deg,#6366f1,#7c3aed);border-radius:8px;">
-                    <svg width="18" height="18" fill="none" stroke="white" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                    </svg>
-                </div>
-                <span class="fw-bold">SuperInventory</span>
-            </a>
-
-            <div class="d-flex align-items-center">
-                <div class="me-3 text-muted small">
-                    Halo, <span class="fw-semibold text-dark">{{ Auth::user()->name }}</span>
-                    <span class="badge bg-secondary ms-2">{{ ucfirst(Auth::user()->role) }}</span>
-                </div>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
-                </form>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container py-4">
-        <div class="mb-2">
-            <a href="{{ route('dashboard') }}" class="btn btn-light align-items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                    stroke="currentColor" style="width:20px;height:20px;">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                </svg>
-                <span class="ms-1 me-2">Back</span>
-            </a>
-        </div>
+    <div class="container py-5">
 
         {{-- Header --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -134,8 +98,7 @@
                 const json = await res.json();
 
                 if (!json.dataProduct || json.dataProduct.length === 0) {
-                    tableBody.innerHTML =
-                        `<tr><td colspan="7" class="text-center text-muted">Tidak ada produk ditemukan.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Tidak ada produk ditemukan.</td></tr>`;
                     return;
                 }
 
@@ -152,8 +115,7 @@
                 renderTable(allProducts);
             } catch (err) {
                 console.error(err);
-                tableBody.innerHTML =
-                    `<tr><td colspan="7" class="text-center text-danger">Gagal memuat data produk.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Gagal memuat data produk.</td></tr>`;
             }
         }
 
@@ -161,8 +123,7 @@
         function renderTable(data) {
             tableBody.innerHTML = "";
             if (!data.length) {
-                tableBody.innerHTML =
-                    `<tr><td colspan="7" class="text-center text-muted">Tidak ada produk ditemukan.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Tidak ada produk ditemukan.</td></tr>`;
                 return;
             }
 
@@ -271,12 +232,7 @@
                         "Content-Type": "application/json",
                         "X-CSRF-TOKEN": token
                     },
-                    body: JSON.stringify({
-                        name,
-                        category,
-                        stock,
-                        unit
-                    }),
+                    body: JSON.stringify({ name, category, stock, unit }),
                 });
 
                 const json = await res.json();
@@ -314,13 +270,7 @@
                         "Content-Type": "application/json",
                         "X-CSRF-TOKEN": token
                     },
-                    body: JSON.stringify({
-                        supplier_id,
-                        name,
-                        category,
-                        stock,
-                        unit
-                    }),
+                    body: JSON.stringify({ supplier_id, name, category, stock, unit }),
                 });
 
                 const json = await res.json();
