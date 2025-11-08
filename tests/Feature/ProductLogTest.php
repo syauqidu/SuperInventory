@@ -113,23 +113,24 @@ class ProductLogTest extends TestCase
     #[Test]
     public function it_returns_logs_matching_user_name()
     {
+        $user = User::factory()->create(['name' => 'Alice']);
         $userMatch = User::factory()->create(['name' => 'John Doe']);
         $userNoMatch = User::factory()->create(['name' => 'Jane Smith']);
         $product = Product::factory()->create(['name' => 'Latte']);
 
-        $log1 = ProductLogs::factory()->create([
+        ProductLogs::factory()->create([
             'user_id' => $userMatch->id,
             'product_id' => $product->id,
             'action' => 'created',
         ]);
 
-        $log2 = ProductLogs::factory()->create([
+        ProductLogs::factory()->create([
             'user_id' => $userNoMatch->id,
             'product_id' => $product->id,
             'action' => 'updated',
         ]);
-
-        $response = $this->get(route('/products-logs/search', ['search' => 'John']));
+        $this->actingAs($user);
+        $response = $this->get('/product-logs/search?search=John');
 
         $response->assertStatus(200);
         $response->assertSee('John Doe');
@@ -143,20 +144,19 @@ class ProductLogTest extends TestCase
         $productMatch = Product::factory()->create(['name' => 'Milk Tea']);
         $productNoMatch = Product::factory()->create(['name' => 'Black Coffee']);
 
-        $log1 = ProductLogs::factory()->create([
+        ProductLogs::factory()->create([
             'user_id' => $user->id,
             'product_id' => $productMatch->id,
             'action' => 'created',
         ]);
 
-        $log2 = ProductLogs::factory()->create([
+        ProductLogs::factory()->create([
             'user_id' => $user->id,
             'product_id' => $productNoMatch->id,
             'action' => 'deleted',
         ]);
-
-        // Search by product name
-        $response = $this->get(route('/products-logs/search', ['search' => 'Milk']));
+        $this->actingAs($user);
+        $response = $this->get('/product-logs/search?search=Milk');
 
         $response->assertStatus(200);
         $response->assertSee('Milk Tea');
