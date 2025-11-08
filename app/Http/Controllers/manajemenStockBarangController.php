@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\ProductLogs;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Exception;
-use Illuminate\Container\Attributes\Auth;
+use Illuminate\Support\Facades\Auth;
 
 class manajemenStockBarangController extends Controller
 {
@@ -18,60 +19,11 @@ class manajemenStockBarangController extends Controller
         return view('manajemenStockBarang.index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Product $product)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Product $product)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Product $product)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Product $product)
-    {
-        //
-    }
-
     public function getProducts(Request $request)
     {
         try {
             // $id_user = $request->input('id_user');
-            $dataProduct = Product::get();
+            $dataProduct = Product::with('supplier', 'stockHistories')->get();
 
             if (!$dataProduct) {
                 return response()->json([
@@ -213,12 +165,12 @@ class manajemenStockBarangController extends Controller
 
             $product->delete();
 
-            ProductLogs::create([
-                'user_id' => Auth::user()->id,
-                'product_id' => $product->id,
-                'action' => 'delete',
-                'description' => 'Hapus product ' . $product->name,
-            ]);
+            // ProductLogs::create([
+            //     'user_id' => Auth::user()->id,
+            //     'product_id' => $product->id,
+            //     'action' => 'delete',
+            //     'description' => 'Hapus product ' . $product->name,
+            // ]);
 
             return response()->json([
                 'message' => 'Berhasil Hapus Product',
@@ -227,6 +179,30 @@ class manajemenStockBarangController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Gagal Hapus Product',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getSuppliers(Request $request)
+    {
+        try {
+            $dataSuppliers = Supplier::get();
+
+            if (!$dataSuppliers) {
+                return response()->json([
+                    'message' => 'Suppliers tidak ditemukan',
+                    'dataSuppliers' => null,
+                ], 404);
+            }
+
+            return response()->json([
+                'message' => 'Berhasil Fetch Suppliers',
+                'dataSuppliers' => $dataSuppliers,
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Gagal Get Tahun Ajaran',
                 'error' => $e->getMessage()
             ], 500);
         }

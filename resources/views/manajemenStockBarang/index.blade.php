@@ -1,22 +1,9 @@
+@extends('layouts.app')
+
 @include('manajemenStockBarang.partials.editform')
 @include('manajemenStockBarang.partials.addmodal')
 
-<!DOCTYPE html>
-<html lang="id">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Stok Barang</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    {{-- Bootstrap CSS --}}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    {{-- Bootstrap Icons --}}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-</head>
-
-<body class="bg-light">
-
+@section('content')
     <div class="container py-5">
 
         {{-- Header --}}
@@ -39,16 +26,13 @@
                             <option value="">Semua Kategori</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col">
                         <select id="sortOption" class="form-select">
                             <option value="">Urutkan</option>
                             <option value="name_asc">Nama (A-Z)</option>
                             <option value="stock_low">Stok Terendah</option>
                             <option value="stock_high">Stok Tertinggi</option>
                         </select>
-                    </div>
-                    <div class="col-md-2 text-end">
-                        <button type="submit" class="btn btn-outline-secondary w-100">Cari</button>
                     </div>
                 </form>
             </div>
@@ -64,7 +48,8 @@
                             <th>Nama Barang</th>
                             <th>Kategori</th>
                             <th>Stok</th>
-                            <th>Unit</th>
+                            <th>Supplier</th>
+                            <th>Satuan Unit</th>
                             <th>Diperbarui</th>
                             <th class="text-center">Aksi</th>
                         </tr>
@@ -83,7 +68,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        const API_BASE = "http://127.0.0.1:8000/manajemenStock";
+        const API_BASE = "http://127.0.0.1:8000/products";
         const tableBody = document.getElementById("tableBody");
         const filterCategory = document.getElementById("filterCategory");
         const searchInput = document.getElementById("searchInput");
@@ -98,24 +83,24 @@
                 const json = await res.json();
 
                 if (!json.dataProduct || json.dataProduct.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Tidak ada produk ditemukan.</td></tr>`;
+                    tableBody.innerHTML =
+                        `<tr><td colspan="7" class="text-center text-muted">Tidak ada produk ditemukan.</td></tr>`;
                     return;
                 }
 
                 // Save all products locally
                 allProducts = json.dataProduct;
 
-                // Populate category dropdown (unique categories)
-                const categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
                 filterCategory.innerHTML = `<option value="">Semua Kategori</option>`;
-                categories.forEach(c => {
+                json.kategori.forEach(c => {
                     filterCategory.innerHTML += `<option value="${c}">${c}</option>`;
                 });
 
                 renderTable(allProducts);
             } catch (err) {
                 console.error(err);
-                tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Gagal memuat data produk.</td></tr>`;
+                tableBody.innerHTML =
+                    `<tr><td colspan="7" class="text-center text-danger">Gagal memuat data produk.</td></tr>`;
             }
         }
 
@@ -123,7 +108,8 @@
         function renderTable(data) {
             tableBody.innerHTML = "";
             if (!data.length) {
-                tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Tidak ada produk ditemukan.</td></tr>`;
+                tableBody.innerHTML =
+                    `<tr><td colspan="7" class="text-center text-muted">Tidak ada produk ditemukan.</td></tr>`;
                 return;
             }
 
@@ -138,6 +124,7 @@
                             ${p.stock}
                         </span>
                     </td>
+                    <td>${p.supplier ? p.supplier.name : 'N/A'}</td>
                     <td>${p.unit}</td>
                     <td>${new Date(p.updated_at).toLocaleDateString('id-ID')}</td>
                     <td class="text-center">
@@ -232,7 +219,12 @@
                         "Content-Type": "application/json",
                         "X-CSRF-TOKEN": token
                     },
-                    body: JSON.stringify({ name, category, stock, unit }),
+                    body: JSON.stringify({
+                        name,
+                        category,
+                        stock,
+                        unit
+                    }),
                 });
 
                 const json = await res.json();
@@ -251,8 +243,25 @@
             addModal.show();
         });
 
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const res = await fetch(`${API_BASE}/getSuppliers`);
+                const json = await res.json();
+                const supplierSelect = document.getElementById("addSupplierId");
+
+                supplierSelect.innerHTML = `<option value="">Pilih Supplier</option>`;
+                json.dataSuppliers.forEach(supplier => {
+                    supplierSelect.innerHTML +=
+                        `<option value="${supplier.id}">${supplier.name}</option>`;
+                });
+            } catch (err) {
+                console.error(err);
+                alert("Gagal memuat data supplier.");
+            }
+        });
+
         // Handle Add Product form
-        document.getElementById("addModal").addEventListener("submit", async (e) => {
+        document.getElementById("addForm").addEventListener("submit", async (e) => {
             e.preventDefault();
 
             const supplier_id = document.getElementById("addSupplierId").value;
@@ -270,7 +279,13 @@
                         "Content-Type": "application/json",
                         "X-CSRF-TOKEN": token
                     },
-                    body: JSON.stringify({ supplier_id, name, category, stock, unit }),
+                    body: JSON.stringify({
+                        supplier_id,
+                        name,
+                        category,
+                        stock,
+                        unit
+                    }),
                 });
 
                 const json = await res.json();
@@ -286,6 +301,4 @@
 
         document.addEventListener("DOMContentLoaded", fetchProducts);
     </script>
-</body>
-
-</html>
+@endsection

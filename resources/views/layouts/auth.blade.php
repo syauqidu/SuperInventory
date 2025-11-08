@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>@yield('title', 'SuperInventory') - Sistem Manajemen Stok UMKM</title>
-    
+
     <!-- Bootstrap 5 (CDN) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -41,7 +41,7 @@
 
             <div class="text-center mt-3 small text-muted">
                 <p class="mb-0">&copy; {{ date('Y') }} SuperInventory. Tim DevOps UMKM</p>
-                <p class="mb-0">Dibuat oleh Syauqi, Nijar, Kalel, Dafa, Siganteng, Darryl</p>
+                <p class="mb-0">Dibuat oleh Syauqi, Nijar, Kalel, Dafa, Rafli, Darryl</p>
             </div>
 
         </div>

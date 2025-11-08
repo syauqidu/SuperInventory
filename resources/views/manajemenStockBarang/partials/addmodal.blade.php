@@ -8,8 +8,10 @@
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label">Supplier ID</label>
-                    <input type="number" class="form-control" id="addSupplierId" required>
+                    <label class="form-label">Supplier</label>
+                    <select class="form-select" id="addSupplierId" required>
+                        <option value="">Pilih Supplier</option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Nama Barang</label>
