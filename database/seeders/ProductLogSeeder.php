@@ -21,23 +21,31 @@ class ProductLogSeeder extends Seeder
             Product::factory()->count(5)->create();
         }
 
-        $users = User::all();
-        $products = Product::all();
+        $user = User::first();
+        $product = Product::first();
 
-        $actions = ['created', 'updated', 'deleted'];
+        ProductLogs::create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'action' => 'created',
+            'description' => 'Example: Created product ' . $product->name . ' by ' . $user->name,
+            'created_at' => now()->subDays(3),
+        ]);
 
-        foreach (range(1, 5) as $i) {
-            $user = $users->random();
-            $product = $products->random();
-            $action = $actions[array_rand($actions)];
+        ProductLogs::create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'action' => 'updated',
+            'description' => 'Example: Updated product ' . $product->name . ' (changed stock) by ' . $user->name,
+            'created_at' => now()->subDays(2),
+        ]);
 
-            ProductLogs::create([
-                'user_id' => $user->id,
-                'product_id' => $product->id,
-                'action' => $action,
-                'description' => ucfirst($action) . ' product ' . $product->name . ' by ' . $user->name,
-                'created_at' => now()->subDays(rand(0, 30))->setTime(rand(8, 18), rand(0, 59)),
-            ]);
-        }
+        ProductLogs::create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'action' => 'deleted',
+            'description' => 'Example: Deleted product ' . $product->name . ' by ' . $user->name,
+            'created_at' => now()->subDay(),
+        ]);
     }
 }
