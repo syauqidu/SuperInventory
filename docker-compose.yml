@@ -1,0 +1,83 @@
+services:
+  app:
+    image: kalpratama/devops-superinventory:v1.0
+    container_name: superinventory-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - superinventory-network
+    depends_on:
+      - mysql
+      - redis
+
+  nginx:
+    image: nginx:alpine
+    container_name: superinventory-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - superinventory-network
+    depends_on:
+      - app
+
+  mysql:
+    image: mysql:8.0
+    container_name: superinventory-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-superinventory}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_USER: ${DB_USERNAME:-superinventory}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - superinventory-network
+
+  redis:
+    image: redis:alpine
+    container_name: superinventory-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - superinventory-network
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: superinventory-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+    ports:
+      - "8081:80"
+    networks:
+      - superinventory-network
+    depends_on:
+      - mysql
+
+# Networks
+networks:
+  superinventory-network:
+    driver: bridge
+
+# Volumes
+volumes:
+  mysql-data:
+    driver: local
+  redis-data:
+    driver: local
