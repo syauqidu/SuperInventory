@@ -19,12 +19,6 @@ class SupplierFeatureTest extends TestCase
         return $this->actingAs($user);
     }
 
-    // #[Test]
-    // public function guests_are_redirected_to_login_when_accessing_supplier_routes()
-    // {
-    //     $this->get('/suppliers')->assertRedirect('/login');
-    // }
-
     #[Test]
     public function it_can_create_a_supplier_with_valid_data()
     {
@@ -47,7 +41,7 @@ class SupplierFeatureTest extends TestCase
 
         $response = $this->post("/suppliers", [
             "name" => "",
-            "contact" => "", // Trigger required rule
+            "contact" => "",
         ]);
 
         $response->assertSessionHasErrors(["name", "contact"]);
@@ -67,22 +61,6 @@ class SupplierFeatureTest extends TestCase
             $response->assertSeeText($supplier->name);
         }
     }
-
-    // #[Test]
-    // public function it_can_display_supplier_with_its_products()
-    // {
-    //     $this->actingAsUser();
-
-    //     $supplier = Supplier::factory()->has(Product::factory()->count(2))->create();
-
-    //     $response = $this->get("/suppliers/{$supplier->id}");
-
-    //     $response->assertStatus(200);
-    //     $response->assertSee(e($supplier->name));
-    //     foreach ($supplier->products as $p) {
-    //         $response->assertSee(e($p->name));
-    //     }
-    // }
 
     #[Test]
     public function it_can_update_supplier()
@@ -112,7 +90,6 @@ class SupplierFeatureTest extends TestCase
     {
         $this->actingAsUser();
 
-        // Ensure factory has relationship method hasProducts or use manual product creation
         $supplier = Supplier::factory()->create();
         Product::factory()
             ->count(3)
@@ -125,6 +102,7 @@ class SupplierFeatureTest extends TestCase
             "supplier_id" => $supplier->id,
         ]);
     }
+
     #[Test]
     public function index_displays_empty_message_when_no_suppliers_exist()
     {
