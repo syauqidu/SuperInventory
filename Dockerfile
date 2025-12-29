@@ -1,60 +1,41 @@
-FROM composer:2.7 AS composer
+# Step 1: Use PHP official image with Apache
+FROM php:8.2-apache
 
-WORKDIR /app
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --ignore-platform-reqs
-
-COPY . .
-RUN composer dump-autoload --optimize
-
-FROM php:8.2-fpm-alpine
-
-# Arguments
-ARG user=www
-ARG uid=1000
-
-# Install system dependencies
-RUN apk add --no-cache \
-    git \
-    curl \
+# Step 2: Install system dependencies and PHP extensions for Laravel
+RUN apt-get update && apt-get install -y \
     libpng-dev \
-    oniguruma-dev \
+    libonig-dev \
     libxml2-dev \
-    libzip-dev \
     zip \
     unzip \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+    git \
+    curl
 
-# Install Redis extension
-RUN apk add --no-cache autoconf g++ make \
-    && pecl install redis \
-    && docker-php-ext-enable redis \
-    && apk del autoconf g++ make
+# Step 3: Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install Composer
-COPY --from=composer /usr/bin/composer /usr/bin/composer
+# Step 4: Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Create system user (Alpine uses adduser differently)
-RUN addgroup -g $uid $user \
-    && adduser -u $uid -G $user -s /bin/sh -D $user \
-    && adduser $user www-data
+# Step 5: Enable Apache mod_rewrite for Laravel routing
+RUN a2enmod rewrite
 
-# Set working directory
-WORKDIR /var/www
+# Step 6: Set working directory
+WORKDIR /var/www/html
 
-# Copy application files from composer stage
-COPY --from=composer /app /var/www
-COPY --chown=$user:$user . /var/www
+# Step 7: Copy project files
+COPY . .
 
-# Set permissions
-RUN chown -R $user:www-data /var/www \
-    && chmod -R 775 /var/www/storage \
-    && chmod -R 775 /var/www/bootstrap/cache
+# Step 8: Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN composer install --no-dev --optimize-autoloader
 
-# Switch to non-root user
-USER $user
+# Step 9: Set permissions for Laravel storage
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Expose port 9000
-EXPOSE 9000
+# Step 10: Point Apache to Laravel's public directory
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-CMD ["php-fpm"]
+EXPOSE 80
