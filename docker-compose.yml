@@ -1,0 +1,46 @@
+services:
+  app:
+    image: kalpratama/devops-superinventory:v1.0
+    container_name: uas_app_container
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+
+    environment:
+      DB_CONNECTION: ${DB_CONNECTION}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      APP_ENV: ${APP_ENV}
+      APP_DEBUG: ${APP_DEBUG}
+      APP_URL: ${APP_URL}
+
+    command: >
+      sh -c "php artisan optimize && apache2-foreground"
+
+    depends_on:
+      - db
+    networks:
+      - uas-network
+
+  # 2. SERVICE DATABASE (MySQL)
+  db:
+    image: mysql:8.0
+    container_name: uas_db_container
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - uas-network
+
+networks:
+  uas-network:
+    driver: bridge
+
+volumes:
+  db_data:
