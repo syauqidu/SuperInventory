@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aplikasi-deployment
+  labels:
+    app: aplikasi-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aplikasi-web
+  template:
+    metadata:
+      labels:
+        app: aplikasi-web
+    spec:
+      initContainers:
+        - name: cek-koneksi-db
+          image: busybox:1.28 # Image super ringan yg punya tool 'nc' (netcat)
+          command:
+            [
+              "sh",
+              "-c",
+              "until nc -z -v -w 2 mysql-service 3306; do echo 'Menunggu MySQL...'; sleep 2; done",
+            ]
+      containers:
+        - name: laravel-app
+          image: kalpratama/devops-superinventory:v1.0
+
+          ports:
+            - containerPort: 80 # Dockerfile (Apache)
+          command: ["/bin/sh", "-c"]
+          args:
+            - "php artisan migrate --force && php artisan optimize:clear && apache2-foreground"
+
+          env:
+            - name: DB_CONNECTION
+              value: "mysql"
+            - name: DB_HOST
+              value: "mysql-service" # MySQL service name
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: uas-db-secret
+                  key: db-name
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: uas-db-secret
+                  key: db-password
+            - name: DB_USERNAME
+              value: "root"
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: uas-db-secret
+                  key: db-root-password
+            - name: APP_ENV
+              value: "local"
+            - name: APP_DEBUG
+              value: "true"
+            - name: APP_URL
+              value: "http://localhost:8080"
+            - name: CACHE_DRIVER
+              value: "file"
+            - name: SESSION_DRIVER
+              value: "file"

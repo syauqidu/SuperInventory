@@ -18,10 +18,13 @@ services:
       APP_URL: ${APP_URL}
 
     command: >
-      sh -c "php artisan optimize && apache2-foreground"
+      sh -c "php artisan migrate --force &&
+             php artisan optimize:clear &&
+             apache2-foreground"
 
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - uas-network
 
@@ -33,6 +36,11 @@ services:
     environment:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     volumes:
       - db_data:/var/lib/mysql
     networks:
