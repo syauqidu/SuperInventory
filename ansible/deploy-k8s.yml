@@ -1,0 +1,57 @@
+- name: Deploy Cluster Kubernetes SuperInventory
+  hosts: servers
+  become: yes
+  tasks:
+    - name: 1. Download dan Install kubectl binary
+      get_url:
+        url: "https://dl.k8s.io/release/v1.28.0/bin/linux/amd64/kubectl"
+        dest: /usr/local/bin/kubectl
+        mode: "0755"
+        owner: root
+        group: root
+
+    - name: 2. Buat folder kubernetes di server
+      file:
+        path: /var/www/super-inventory/kubernetes
+        state: directory
+        owner: syauqidu
+        group: syauqidu
+
+    - name: 3. Sync file Kubernetes ke server
+      synchronize:
+        src: "../../SuperInventory/kubernetes/"
+        dest: /var/www/super-inventory/kubernetes/
+        recursive: yes
+
+    - name: 4. Install Minikube
+      get_url:
+        url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+        dest: /usr/local/bin/minikube
+        mode: "0755"
+
+    - name: 5. Jalankan Minikube (Sebagai User Biasa)
+      become: no # Minikube tidak boleh dijalankan sebagai root langsung
+      shell: minikube start --driver=docker
+
+    - name: 6. Apply Secret (Konfigurasi DB)
+      become_user: syauqidu
+      # Pastikan kamu sudah mengisi secret.yaml dengan data base64
+      shell: /usr/local/bin/kubectl apply -f secret.yaml
+      args:
+        chdir: /var/www/super-inventory/kubernetes
+
+    - name: 7. Deploy MySQL (PVC, Deployment, Service)
+      become_user: syauqidu
+      shell: |
+        /usr/local/bin/kubectl apply -f mysql-deployment.yaml
+        /usr/local/bin/kubectl apply -f mysql-service.yaml
+      args:
+        chdir: /var/www/super-inventory/kubernetes
+
+    - name: 8. Deploy Aplikasi Laravel
+      become_user: syauqidu
+      shell: |
+        /usr/local/bin/kubectl apply -f app-deployment.yaml
+        /usr/local/bin/kubectl apply -f app-service.yaml
+      args:
+        chdir: /var/www/super-inventory/kubernetes
