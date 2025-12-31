@@ -1,0 +1,83 @@
+- name: Persiapan Environment Kubernetes dan Docker
+  hosts: servers
+  become: yes
+  tasks:
+    # - name: 1. Update semua paket sistem ke versi terbaru
+    #   dnf:
+    #     name: "*"
+    #     state: latest
+
+    - name: 2. Matikan SWAP (Wajib untuk Kubernetes)
+      shell: |
+        swapoff -a
+        sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+    - name: 3. Set SELinux ke Permissive (Agar K8s bisa akses file)
+      shell: |
+        setenforce 0
+        sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/config/selinux
+      ignore_errors: yes
+
+    - name: 4. Tambah Repository Docker
+      shell: dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+      args:
+        creates: /etc/yum.repos.d/docker-ce.repo
+
+    - name: 5. Install Docker dan Containerd
+      dnf:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+
+    - name: 6. Jalankan dan Aktifkan Docker Service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: 7. Izinkan User Biasa menjalankan Docker (Opsional tapi berguna)
+      user:
+        name: syauqidu
+        groups: docker
+        append: yes
+
+    - name: 8. Pastikan rsync terinstall di server
+      dnf:
+        name: rsync
+        state: present
+
+    - name: 9. Buat folder project di server
+      file:
+        path: /var/www/super-inventory
+        state: directory
+        mode: "0755"
+        owner: syauqidu
+        group: syauqidu
+
+    - name: 10. Sync file project ke server (synchronize)
+      synchronize:
+        src: ../../SuperInventory/
+        dest: /var/www/super-inventory/
+        recursive: yes
+        delete: yes
+        rsync_opts:
+          - "--exclude=ansible"
+          - "--exclude=vendor"
+          - "--exclude=node_modules"
+          - "--exclude=.git"
+          - "--exclude=.env.example"
+
+    - name: 11. Pastikan file .env ter-copy manual
+      copy:
+        src: ../.env
+        dest: /var/www/super-inventory/.env
+        mode: "0600"
+        owner: syauqidu
+        group: syauqidu
+
+    - name: 12. Jalankan Docker Compose
+      shell:
+        cmd: docker compose up -d --build
+        chdir: /var/www/super-inventory

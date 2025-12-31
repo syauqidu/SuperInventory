@@ -1,0 +1,42 @@
+- name: Deploy Aplikasi Laravel SuperInventory
+  hosts: servers
+  become: yes
+  tasks:
+    - name: 0. Pastikan rsync terinstall di server
+      dnf:
+        name: rsync
+        state: present
+
+    - name: 1. Buat folder project di server
+      file:
+        path: /var/www/super-inventory
+        state: directory
+        mode: "0755"
+        owner: syauqidu
+        group: syauqidu
+
+    - name: 2. Sync file project ke server (synchronize)
+      synchronize:
+        src: ../../SuperInventory/
+        dest: /var/www/super-inventory/
+        recursive: yes
+        delete: yes
+        rsync_opts:
+          - "--exclude=ansible"
+          - "--exclude=vendor"
+          - "--exclude=node_modules"
+          - "--exclude=.git"
+          - "--exclude=.env.example"
+
+    - name: 3. Pastikan file .env ter-copy manual
+      copy:
+        src: ../.env
+        dest: /var/www/super-inventory/.env
+        mode: "0600"
+        owner: syauqidu
+        group: syauqidu
+
+    - name: 4. Jalankan Docker Compose
+      shell:
+        cmd: docker compose up -d --build
+        chdir: /var/www/super-inventory
