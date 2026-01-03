@@ -38,19 +38,6 @@ services:
     networks:
       - uas-network
 
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.47.2
-    container_name: cadvisor
-    ports:
-      - "8080:8080"
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-    networks:
-      - uas-network
-
   prometheus:
     image: prom/prometheus:v2.46.0
     container_name: prometheus
@@ -76,7 +63,6 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
     networks:
       - uas-network
-
 
   grafana:
     image: grafana/grafana:latest
