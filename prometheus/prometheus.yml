@@ -1,12 +1,18 @@
-global:
-  scrape_interval: 15s
+# prometheus.yml
+# Prometheus configuration file
 
+global:
+  scrape_interval: 15s          # How often to scrape targets by default
+  evaluation_interval: 15s      # How often to evaluate rules
+
+# Scrape configs for your targets
 scrape_configs:
+  # 1. Prometheus itself
   - job_name: "prometheus"
     static_configs:
-      - targets: ["localhost:9090"]
+      - targets: ["prometheus:9090"]  # Prometheus container name
 
+  # 2. cAdvisor metrics
   - job_name: "cadvisor"
     static_configs:
-      - targets: ["cadvisor:8080"]
-
+      - targets: ["cadvisor:8080"]   # cAdvisor container name

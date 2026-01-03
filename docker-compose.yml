@@ -49,6 +49,21 @@ services:
       - "--config.file=/etc/prometheus/prometheus.yml"
     networks:
       - uas-network
+      
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    container_name: cadvisor
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - uas-network
+
 
 networks:
   uas-network:
